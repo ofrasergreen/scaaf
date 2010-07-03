@@ -18,11 +18,15 @@
 package scaaf.logging
 
 import org.slf4j.{Logger, LoggerFactory}
+import org.apache.log4j.BasicConfigurator
 
 trait Logging {
   private val log = LoggerFactory.getLogger(getClass)
   
   object Log {
+    // Initialize log4j logging
+    BasicConfigurator.configure
+    
     def trace(message:String, values:Any*) = 
         log.trace(message, values.map(_.asInstanceOf[Object]).toArray)
     def trace(message:String, error:Throwable) = log.trace(message, error)

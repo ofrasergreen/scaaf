@@ -14,25 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.test
+import scala.collection.mutable.ListBuffer
 
-import scaaf._
-import space.Space
-import space.Reboot
-import kernel.Server
-import java.io.File
-
-
-trait InitSpec extends Application {
-  bootstrap
-  val server = new Server()
-  
-  def bootstrap() {
-    server.bootstrap(None)
-  }
-  
-  def reset() {
-    Space !? Reboot
+/**
+ * @author ofrasergreen
+ *
+ */
+class Help extends CLIService {
+  def help(): ListBuffer[String] = {
+    println("Calling help!!!")
+    val output = ListBuffer[String]()
+    output += "Help:"
   }
 }

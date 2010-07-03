@@ -14,25 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.test
-
-import scaaf._
-import space.Space
-import space.Reboot
-import kernel.Server
-import java.io.File
-
-
-trait InitSpec extends Application {
-  bootstrap
-  val server = new Server()
-  
-  def bootstrap() {
-    server.bootstrap(None)
-  }
-  
-  def reset() {
-    Space !? Reboot
-  }
+/**
+ * A registry mapping CLI commands or groups to their implementation
+ * 
+ * @author ofrasergreen
+ */
+object Registry extends RegistryEntry("", None) {
+  entries("help") = new RegistryEntry("display this help and exit", Some(("scaaf.cli.Help", "help")))
 }

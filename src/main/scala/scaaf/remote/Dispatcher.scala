@@ -22,6 +22,9 @@ import scala.actors.Actor._
 import scala.collection.mutable.{Map, ListBuffer}
 import java.util.Random
 
+/**
+ * Dispatches work to the workers.
+ */
 class Dispatcher() extends Actor {
   val idleWorkers = new ListBuffer[ServerWorker]
   val busyWorkers = Map[Int, ServerWorker]()

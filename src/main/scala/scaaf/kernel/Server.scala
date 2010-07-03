@@ -14,24 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package scaaf.kernel
 
-import scaaf.logging._
-import org.apache.log4j.BasicConfigurator
+import scaaf.cli.CLIService
+import scaaf.logging.Logging
+import scaaf.remote.SelectingRunner
 import scaaf.space.Space
 import scaaf.space.Reboot
-import scaaf.remote.SelectingRunner
 
-trait Server extends Logging {
-  BasicConfigurator.configure
-  
+/**
+ * @author ofrasergreen
+ *
+ */
+class Server extends CLIService with Logging {
   def start() {
     Log.info("Bootstrapping...")
     bootstrap(Some("space"))
     SelectingRunner.start
     Log.info("Server started")
-    
   }
   
   def bootstrap(spaceDir: Option[String]) {

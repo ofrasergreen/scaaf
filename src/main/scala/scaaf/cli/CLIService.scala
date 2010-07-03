@@ -14,25 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.test
+import scaaf.kernel.StatelessService
 
-import scaaf._
-import space.Space
-import space.Reboot
-import kernel.Server
-import java.io.File
+/**
+ * @author ofrasergreen
+ *
+ */
+trait CLIService extends StatelessService {
 
-
-trait InitSpec extends Application {
-  bootstrap
-  val server = new Server()
-  
-  def bootstrap() {
-    server.bootstrap(None)
-  }
-  
-  def reset() {
-    Space !? Reboot
-  }
 }

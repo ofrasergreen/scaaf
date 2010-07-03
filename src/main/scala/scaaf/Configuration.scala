@@ -14,25 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf
 
-package scaaf.test
-
-import scaaf._
-import space.Space
-import space.Reboot
-import kernel.Server
-import java.io.File
-
-
-trait InitSpec extends Application {
-  bootstrap
-  val server = new Server()
-  
-  def bootstrap() {
-    server.bootstrap(None)
-  }
-  
-  def reset() {
-    Space !? Reboot
-  }
+/**
+ * @author ofrasergreen
+ *
+ */
+object Configuration {
+  var name: String = "UNDEFINED"
 }

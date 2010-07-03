@@ -14,25 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.test
+import scala.collection.mutable.Map
 
-import scaaf._
-import space.Space
-import space.Reboot
-import kernel.Server
-import java.io.File
-
-
-trait InitSpec extends Application {
-  bootstrap
-  val server = new Server()
-  
-  def bootstrap() {
-    server.bootstrap(None)
-  }
-  
-  def reset() {
-    Space !? Reboot
-  }
+/**
+ * An entry in the Registry representing a CLI command or group
+ * 
+ * @author ofrasergreen
+ */
+case class RegistryEntry(
+  val description: String,
+  val classMethod: Option[(String, String)]
+  ) {
+  val entries = Map[String, RegistryEntry]() 
 }
+  

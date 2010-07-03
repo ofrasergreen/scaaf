@@ -116,7 +116,7 @@ object Space extends Actor with Logging {
   }
   
   private def writeToDisk(obj: Spacy): Unit = {
-    Log.debug("Writing " + obj.uuid)
+    //Log.debug("Writing " + obj.uuid)
     // TODO - Find a cleaner way to do this
     val cls = if (obj.getClass.getName.contains("$anon$")) obj.getClass.getSuperclass else obj.getClass
     val className = cls.getCanonicalName
@@ -165,12 +165,12 @@ object Space extends Actor with Logging {
   }
   
   def find[T <: Spacy](u: UUID): T = {
-    Log.debug("Find " + u.toString)
+    //Log.debug("Find " + u.toString)
     cache(u).asInstanceOf[T]
   }
   
   def find[T <: Spacy](implicit m: Manifest[T]): immutable.Set[T] = {
-    Log.debug("Find " + m.toString)
+    //Log.debug("Find " + m.toString)
     val cls = Class.forName(m.toString)
     val matches = cache.values.filter(x => (cls.isAssignableFrom(x.getClass)))
     //Log.debug("Found: " + matches)
@@ -191,7 +191,7 @@ object Space extends Actor with Logging {
     def get(cls: Class[Any]) = registry.get(cls)
     
     def register(cls: Class[Any], format: SpacyFormat[Spacy]) {
-      Log.debug("Registering spacy formatter for " + cls.getName)
+      //Log.debug("Registering spacy formatter for " + cls.getName)
       registry(cls) = format
     }
   }
