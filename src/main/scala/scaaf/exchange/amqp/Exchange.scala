@@ -29,10 +29,14 @@ case class Bind(
     val queueName: String, 
     val routingKey: String)
 case class Incoming(message: Message)
+case class DeclareQueue(name: String, durable: Boolean)
+case class DeclareExchange(name: String, exchangeType: String, durable: Boolean)
+case class BindQueue(queueName: String, exchangeName: String, routingKey: String)
 
 class Exchange(connection: Connection) extends scaaf.exchange.Exchange with ReplySender with Actor with Logging {  
   private val thesender = new Sender(connection)
   private var receivers: List[Receiver] = List.empty
+  private val channel = connection.conn.createChannel 
   
   Log.debug("Creating AMQP exchange to %s:%s".format(connection.hostName, connection.portNumber))
   
@@ -43,11 +47,15 @@ class Exchange(connection: Connection) extends scaaf.exchange.Exchange with Repl
         Log.debug("Receivers now contains: " + receivers)
       case m: Message =>
         thesender.send(m)
-      
+      case DeclareQueue(name, durable) =>
+        channel.queueDeclare(name, durable) 
+      case DeclareExchange(name, exchangeType, durable) =>
+        channel.exchangeDeclare(name, exchangeType, true)
+      case BindQueue(queueName, exchangeName, routingKey) => channel.queueBind(queueName, exchangeName, routingKey) 
     }
   }
   
   def sendReply(msg: Object) = {
     Log.debug("TODO")
-  }
+  } 
 }

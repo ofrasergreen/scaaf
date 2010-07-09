@@ -54,7 +54,7 @@ class Receiver(connection: Connection, bind: Bind, exchange: Exchange) {
   
   val channel = {
     val chan = connection.conn.createChannel
-    chan.exchangeDeclare(bind.exchangeName, "topic", true)
+    chan.exchangeDeclare(bind.exchangeName, "direct", true)
     chan.queueDeclare(bind.queueName, true)
     chan.queueBind(bind.queueName, bind.exchangeName, bind.routingKey)
     

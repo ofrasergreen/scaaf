@@ -177,9 +177,10 @@ object Space extends Actor with Logging {
     matches.toSet.asInstanceOf[immutable.Set[T]]
   }
   
-  def write[T <: Spacy](obj: T): Unit = {
+  def write[T <: Spacy](obj: T): T = {
     if (obj.valid) {
       this !? Write(obj)
+      obj
     } else {
       throw ValidationException("Validation failed when storing " + obj.getClass + " " + obj.uuid)
     }

@@ -63,5 +63,9 @@ object Invoker {
   
   def invoke(entry: RegistryEntry, args: List[String]) {
     println("Invoking: " + entry.toString)
+    // TODO: Do this properly
+    if (entry.classMethod.get == ("scaaf.kernel.Server", "start"))
+      new scaaf.kernel.Server().start
+    
   }
 }

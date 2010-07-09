@@ -24,9 +24,6 @@ trait Logging {
   private val log = LoggerFactory.getLogger(getClass)
   
   object Log {
-    // Initialize log4j logging
-    BasicConfigurator.configure
-    
     def trace(message:String, values:Any*) = 
         log.trace(message, values.map(_.asInstanceOf[Object]).toArray)
     def trace(message:String, error:Throwable) = log.trace(message, error)
@@ -56,5 +53,7 @@ trait Logging {
     def error(message:String, error:Throwable) = log.error(message, error)
     def error(message:String, error:Throwable, values:Any*) =
         log.error(message, error, values.map(_.asInstanceOf[Object]).toArray)
+        
+    def initialize = BasicConfigurator.configure
   }
 }

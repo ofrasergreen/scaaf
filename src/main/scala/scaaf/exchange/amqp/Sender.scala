@@ -26,7 +26,7 @@ class Sender(connection: Connection) extends Logging {
   val chan = connection.conn.createChannel
   
   def send(message: Message) {
-    Log.debug("Sending message.")
+    Log.debug("Sending message of type '%s' to exchange '%s' with key '%s'".format(message.properties.messageType.getOrElse(""), message.envelope.exchange, message.envelope.routingKey))
     val properties = new BasicProperties(
         message.properties.contentType.orNull,
         message.properties.contentEncoding.orNull,

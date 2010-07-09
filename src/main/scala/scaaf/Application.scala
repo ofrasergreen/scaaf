@@ -28,6 +28,11 @@ import scaaf.cli.Invoker
  */
 trait Application extends Logging {
   def main(args: Array[String]): Unit = {
+    ApplicationRef.application = this
+    
+    // Initialize the logger
+    Log.initialize
+    
     // Add the server CLI (TODO: Find a better place for this)
     val serverCLI = new RegistryEntry("view or change the state of the server", None)
     serverCLI.entries("start") = new RegistryEntry("start the server", Some(("scaaf.kernel.Server", "start")))
@@ -46,4 +51,8 @@ trait Application extends Logging {
   def init {
     
   }
+}
+
+object ApplicationRef {
+  var application: Application = new Application() {}
 }

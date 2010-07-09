@@ -21,6 +21,7 @@ import scaaf.logging.Logging
 import scaaf.remote.SelectingRunner
 import scaaf.space.Space
 import scaaf.space.Reboot
+import scaaf.ApplicationRef
 
 /**
  * @author ofrasergreen
@@ -32,6 +33,7 @@ class Server extends CLIService with Logging {
     bootstrap(Some("space"))
     SelectingRunner.start
     Log.info("Server started")
+    ApplicationRef.application.init
   }
   
   def bootstrap(spaceDir: Option[String]) {
