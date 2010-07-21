@@ -14,34 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.test
-
-import scaaf._
-import space.Space
-import space.Reboot
-import kernel.Server
-import java.io.File
-import scaaf.logging._
-import scaaf.cli.IPCService
-
-object OnetimeBootstrap extends Logging {
-  Log.initialize
-  IPCService.start
-}
-
-trait InitSpec extends Application {
-  Configuration.varDir = "test"
-  OnetimeBootstrap
-  val server = new Server()
-  bootstrap
-  
-  def bootstrap {
-    Space.memOnly = true
-    server.bootstrap
-  }
-  
-  def reset {
-    Space !? Reboot
-  }
-}
+/**
+ * @author ofrasergreen
+ *
+ */
+case class InvocationTarget(
+    cls: String, 
+    method: String, 
+    local: Boolean = false,
+    argSpec: List[Arg]
+    )

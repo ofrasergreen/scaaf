@@ -27,6 +27,8 @@ import DefaultProtocol._
 import Operations._
 import JavaIO._;
 import scala.reflect.Manifest
+import scaaf.Configuration
+import java.io.File
 
 case class ValidationException(reason: String) extends Exception(reason) 
 
@@ -68,8 +70,8 @@ trait SpacyFormat[T <: Spacy] {
 object Space extends Actor with Logging {
   private val cache = mutable.Map[UUID, Spacy]()
   private var stats = Statistics(0)
-  private var spaceDir = "space"
-  private var memOnly = false
+  private val spaceDir = Configuration.varDir + File.separator + "space"
+  var memOnly = false
   
   def statistics = stats
   
@@ -99,17 +101,7 @@ object Space extends Actor with Logging {
       }
     
   }
-  
-  def start(spaceDir: Option[String]): Actor = {
-    println("Spacedir: " + spaceDir)
-    spaceDir match {
-      case Some(dir) => this.spaceDir = dir
-      case None => memOnly = true
-    }
     
-    start
-  }
-  
   private def addToCache(obj: Spacy) = {
     cache(obj.uuid) = obj
     stats = stats copy (objectCount = stats.objectCount + 1)
@@ -132,6 +124,8 @@ object Space extends Actor with Logging {
     // Write it
     val out = new BufferedOutputStream(new FileOutputStream(file))
     val target = new ByteArrayOutputStream();
+    // TODO: Write real headers
+    SpacyProtocol.HeaderFormat.writes(target, new Header(1, 1, 1))
     format.writes(target, obj)
     try {
       out.write(target.toByteArray)
@@ -158,6 +152,7 @@ object Space extends Actor with Logging {
         
     val in = new BufferedInputStream(new FileInputStream(file))
     try {
+      SpacyProtocol.HeaderFormat.reads(in)
       format.reads(in, uuid)
     } finally {
       in.close() 

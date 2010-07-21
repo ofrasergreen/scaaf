@@ -14,36 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package scaaf.cli
 
-object Formatter {
-  def format(out: List[CLIOutput]): String = {
+import scaaf.space._
+import scala.collection.mutable.ListBuffer
+
+/**
+ * @author ofrasergreen
+ *
+ */
+case class TableOutput(rows: List[TableRowOutput]) extends CLIOutput {  
+  def format(): List[String] = {
     // Convert to a List[List[String]]
-    if (out.isEmpty) {
-      return "Nothing"
+    if (rows.isEmpty) {
+      return List()
     }
     
-    val first = out(0)
-    val table = first.tableFormat.keys.toList :: out.map(o => o.tableFormat.values.map(v => first.format(v.toString)).toList)
-    
+    val first = rows.head
+    val table = first.columns.keys.toList :: rows.map(o => o.columns.values.map(_.toString).toList)    
     
     // Initiate the lengths list to 0
     val lengths = Array.fill(table(0).size)(0)
     
     // Look for the longest item in each column
     table.foreach(y => 
-      for (i <- 0 to y.size - 1)(lengths(i) = lengths(i).max(y(i).length))
+      for (i <- 0 to y.size - 1)(lengths(i) = lengths(i).max(y(i).toString.length))
     )
     
-    var output = ""
+    val output = ListBuffer[String]()
     table.foreach(y => {
+      var row = ""
       for (i <- 0 to y.size - 1)({
-        output += y(i) + " " * (lengths(i) - y(i).length + 1)
+        row += y(i).toString + " " * (lengths(i) - y(i).toString.length + 1)
       })
-      output += "\n"
+      output += row
     })
     
-    output
+    output.toList
   }
 }

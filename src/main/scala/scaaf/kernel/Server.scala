@@ -30,14 +30,18 @@ import scaaf.ApplicationRef
 class Server extends CLIService with Logging {
   def start() {
     Log.info("Bootstrapping...")
-    bootstrap(Some("space"))
+    bootstrap
     SelectingRunner.start
     Log.info("Server started")
     ApplicationRef.application.init
   }
   
-  def bootstrap(spaceDir: Option[String]) {
-    Space.start(spaceDir)
+  def bootstrap {
+    // Initialize space
+    Space.start
     Space !? Reboot
+    
+    // Initialize CLI IPC service
+    
   }
 }

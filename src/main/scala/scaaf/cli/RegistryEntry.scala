@@ -23,10 +23,10 @@ import scala.collection.mutable.Map
  * 
  * @author ofrasergreen
  */
+
 case class RegistryEntry(
   val description: String,
-  val classMethod: Option[(String, String)]
+  val target: Option[InvocationTarget]
   ) {
   val entries = Map[String, RegistryEntry]() 
 }
-  

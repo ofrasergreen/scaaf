@@ -71,7 +71,8 @@ class SpaceSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with 
   Space.FormatRegistry.register(classOf[Bar].asInstanceOf[Class[Any]], FooProtocol.BarFormat.asInstanceOf[SpacyFormat[Spacy]])
 
   override def bootstrap = {
-    bootstrap(Some("test/space"))
+    Space.memOnly = false
+    server.bootstrap
   }
   
   def deleteAll(dir: File): Unit = {

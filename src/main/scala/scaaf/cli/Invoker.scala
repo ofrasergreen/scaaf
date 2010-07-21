@@ -37,7 +37,7 @@ object Invoker {
       i += 1
     }
     
-    if (registry.classMethod.isDefined) {
+    if (registry.target.isDefined) {
       invoke(registry, args.view(i, args.length).toList)
     } else {
       if (i >= args.length) {
@@ -61,11 +61,39 @@ object Invoker {
     System.exit(1)
   }
   
-  def invoke(entry: RegistryEntry, args: List[String]) {
-    println("Invoking: " + entry.toString)
-    // TODO: Do this properly
-    if (entry.classMethod.get == ("scaaf.kernel.Server", "start"))
-      new scaaf.kernel.Server().start
+  def mapArgs(args: List[String], types: List[Class[_]]): Array[AnyRef] = {
+    var result = List[AnyRef]()
+  
+    // First get a list of the options
     
+    var i = 0
+    args.foreach(t => {
+      val arg = args(i)
+      
+      
+      i += 1
+    })
+    
+    result.toArray
+  }
+  
+  def invoke(entry: RegistryEntry, args: List[String]) {
+    val target = entry.target.get
+    val klass = Class.forName(target.cls)
+    val method = klass.getMethods().find(_.getName == target.method).getOrElse(
+        throw new Exception("Couldn't find method '" + target.method + "' on service '" + target.cls + "'")
+      )
+    
+    val typedArgs = mapArgs(args, method.getParameterTypes.toList)
+      
+    if (target.local) {
+      val cliService = klass.newInstance.asInstanceOf[CLIService]
+      
+      val result = method.invoke(cliService, typedArgs:_*).asInstanceOf[CLIOutput]
+      result.format.foreach(println)
+    }
+    //if (entry.target.get == ("scaaf.kernel.Server", "start"))
+    //  new scaaf.kernel.Server().start
+    //else if (entry.classMethod.get._1 == ("scaaf.kernel.Server", "start"))
   }
 }

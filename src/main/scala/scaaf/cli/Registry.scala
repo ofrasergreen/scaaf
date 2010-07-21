@@ -22,5 +22,11 @@ package scaaf.cli
  * @author ofrasergreen
  */
 object Registry extends RegistryEntry("", None) {
-  entries("help") = new RegistryEntry("display this help and exit", Some(("scaaf.cli.Help", "help")))
+  entries("help") = new RegistryEntry("display help and exit", Some(
+      InvocationTarget(
+          "scaaf.cli.Help", 
+          "help", 
+          true,
+          List(new Arg("COMMAND", "COMMANDs are command and optionally sub-commands to display help about.", true, classOf[String]))
+      )))
 }

@@ -14,34 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.remote
 
-package scaaf.test
+import scaaf.space.SpacyProtocol
 
-import scaaf._
-import space.Space
-import space.Reboot
-import kernel.Server
-import java.io.File
-import scaaf.logging._
-import scaaf.cli.IPCService
+import java.util.UUID
 
-object OnetimeBootstrap extends Logging {
-  Log.initialize
-  IPCService.start
-}
+import sbinary._
+import DefaultProtocol._
+import Operations._
 
-trait InitSpec extends Application {
-  Configuration.varDir = "test"
-  OnetimeBootstrap
-  val server = new Server()
-  bootstrap
-  
-  def bootstrap {
-    Space.memOnly = true
-    server.bootstrap
-  }
-  
-  def reset {
-    Space !? Reboot
+/**
+ * @author ofrasergreen
+ *
+ */
+object RemoteProtocol extends SpacyProtocol {
+  implicit object RemoteHeaderFormat extends Format[Header] {
+    def reads(in : Input) =  Header(read[UUID](in), read[UUID](in), read[Byte](in), 
+        read[Short](in), read[Int](in))
+    
+    def writes(out : Output, h: Header) = {
+      write(out, h.ID)
+      write(out, h.channel)
+      write(out, h.messageType)
+      write(out, h.messageClass)
+      write(out, h.size)
+    }
   }
 }

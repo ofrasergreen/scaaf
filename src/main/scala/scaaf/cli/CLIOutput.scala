@@ -20,7 +20,5 @@ package scaaf.cli
 import scala.collection.Map
 
 trait CLIOutput {
-  def tableFormat: Map[String, Any]
-  
-  def format(in: Any): String = "" + in
+  def format: List[String]
 }

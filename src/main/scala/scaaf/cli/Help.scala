@@ -17,15 +17,33 @@
 package scaaf.cli
 
 import scala.collection.mutable.ListBuffer
+import scala.collection.immutable.ListMap
+import scaaf.Configuration
 
 /**
  * @author ofrasergreen
  *
  */
 class Help extends CLIService {
-  def help(): ListBuffer[String] = {
-    println("Calling help!!!")
-    val output = ListBuffer[String]()
-    output += "Help:"
+  def help(category: String): CLIOutput = {
+    println("Category: " + category)
+    val categories = TableOutput(Registry.entries.keySet.map(k => TableRowOutput(ListMap(
+      "category" -> k,
+      "description" -> Registry.entries(k).description
+    ))).toList)
+    
+    
+    
+    new CLIOutput() {
+      def format = {
+        val output = ListBuffer[String]()
+        output += "usage: " + Configuration.name + " <command> [subcommand] [options] [args]"
+        output += "Type '" + Configuration.name + " help <command>' for help on a specific command."
+        output += ""
+        output += "Available commands:"
+        output ++= categories.format.drop(1).map("   " + _)
+        output.toList
+      }
+    }
   }
 }
