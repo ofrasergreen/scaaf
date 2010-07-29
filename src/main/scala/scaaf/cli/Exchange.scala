@@ -16,14 +16,65 @@
  */
 package scaaf.cli
 
+import scaaf.logging.Logging
+import scaaf.exchange.ExchangeRegistry
+import scaaf.exchange.Channel
+
+import scaaf.remote.Frame
+import scaaf.remote.Message
+import scaaf.remote.End
+import scaaf.exchange.isc.ISCDispatcher
+import scaaf.GUID
 import scaaf.Configuration
+import scaaf.cluster.LocalNode
+
+import scala.collection.mutable.ListBuffer
+import scala.actors.Actor
+import Actor._
+
+import scaaf.space.Spacy
+
+import java.io.PrintWriter
+import java.io.BufferedWriter
 
 /**
  * @author ofrasergreen
  *
  */
-object Invoker {
-  def invoke(args: Array[String]) {
+object Exchange extends scaaf.exchange.Exchange[Spacy] with ISCDispatcher with Actor with Logging {
+  // Register
+  ExchangeRegistry.register(this)
+
+  def address = new scaaf.exchange.Address {
+    override def addID = GUID.newAddID(Exchange.getClass, LocalNode.ID, 0)
+  }
+
+  println("exchange addr: " + address.addID)
+  
+  def act = loop {
+    react {
+      case _ =>
+        Log.debug("Unhandled message.")
+    }
+  }
+  
+  def deliver(frame: Frame, channel: Channel[Spacy]) {
+    // Create a buffered 1k print writer which will return messages
+    val writer = new PrintWriter(new BufferedWriter(new RemoteWriter(channel), 1024))
+    frame match {
+      case m: Message => 
+        m.payload match {
+          case r: Request => invoke(r.args, writer)
+          case _ => Log.error("Received unwanted message of type " + m.payload.getClass)
+        }
+        
+      case _ =>
+        Log.error("Received unwanted frame of type " + frame.getClass)
+    }
+  }
+  
+  def invoke(args: Array[String], writer: PrintWriter) {
+    Log.debug("Invoking CLI with args: " + args.toString)
     if (args.length == 0) {
       errorExit(List("Interactive shell not implemented.", 
         "Type '" + Configuration.name + " help' for a list of available commands."))
@@ -38,7 +89,7 @@ object Invoker {
     }
     
     if (registry.target.isDefined) {
-      invoke(registry, args.view(i, args.length).toList)
+      invoke(registry, args.view(i, args.length).toList, writer)
     } else {
       if (i >= args.length) {
         errorExit(List("Not enough arguments provided.", 
@@ -61,39 +112,41 @@ object Invoker {
     System.exit(1)
   }
   
-  def mapArgs(args: List[String], types: List[Class[_]]): Array[AnyRef] = {
-    var result = List[AnyRef]()
+  def mapArgs(args: List[String], argSpec: List[Arg]): Array[AnyRef] = {
+    var result = ListBuffer[AnyRef]()
   
-    // First get a list of the options
+    // TODO: Handle options
     
     var i = 0
-    args.foreach(t => {
-      val arg = args(i)
-      
+    argSpec.foreach(spec => {
+      if (spec.repeated) {
+        result += args.slice(i, args.length)
+      }
       
       i += 1
     })
     
+    Log.debug("Arguments: " + result)
+    
     result.toArray
   }
   
-  def invoke(entry: RegistryEntry, args: List[String]) {
+  def invoke(entry: RegistryEntry, args: List[String], writer: PrintWriter) {
     val target = entry.target.get
     val klass = Class.forName(target.cls)
     val method = klass.getMethods().find(_.getName == target.method).getOrElse(
         throw new Exception("Couldn't find method '" + target.method + "' on service '" + target.cls + "'")
       )
     
-    val typedArgs = mapArgs(args, method.getParameterTypes.toList)
+    val typedArgs = mapArgs(args, target.argSpec)
       
     if (target.local) {
       val cliService = klass.newInstance.asInstanceOf[CLIService]
       
-      val result = method.invoke(cliService, typedArgs:_*).asInstanceOf[CLIOutput]
-      result.format.foreach(println)
+      val view = method.invoke(cliService, typedArgs:_*).asInstanceOf[CLIView]
+      view.render(writer)
     }
-    //if (entry.target.get == ("scaaf.kernel.Server", "start"))
-    //  new scaaf.kernel.Server().start
-    //else if (entry.classMethod.get._1 == ("scaaf.kernel.Server", "start"))
+    
+    writer.close
   }
 }

@@ -14,25 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package scaaf.exchange
 
-import scaaf.kernel._
+import scaaf.logging.Logging
 
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
+import scala.collection._
+
+// TODO: This is a temporary class in the absence of the extension mechanism
+/**
+ * @author ofrasergreen
+ *
+ */
+object ExchangeRegistry extends Logging {
+  val map = mutable.Map[Int, Exchange[_]]()
+
+  def getExchange(exchangeID: Int) = map(exchangeID)
+    
+  def register(exchange: Exchange[_]) {
+    val cls = exchange.getClass
+    Log.debug("Registering exchange %d:%s".format(cls.getCanonicalName.hashCode, cls.getName))
+    map(cls.getCanonicalName.hashCode) = exchange
   }
-  
-  def reply(msg: T) = {
-    channel.reply(msg)
-  }
-  
 }
-
-trait StatelessListener[T] extends Listener[T] with StatelessService

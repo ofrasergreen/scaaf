@@ -14,25 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.exchange.amqp
 
-package scaaf.exchange
+import scaaf.logging.Logging
 
-import scaaf.kernel._
-
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
+/**
+ * @author ofrasergreen
+ *
+ */
+class Channel extends scaaf.exchange.Channel[Message] with Logging {
+  def reply(msg: Message) {
+    Log.error("TODO: Implement reply.")
   }
-  
-  def reply(msg: T) = {
-    channel.reply(msg)
+  def close() {
+    
   }
-  
 }
-
-trait StatelessListener[T] extends Listener[T] with StatelessService

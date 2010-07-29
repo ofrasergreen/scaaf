@@ -14,25 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.exchange
+/**
+ * @author ofrasergreen
+ *
+ */
+class RemoteInputStream {
 
-import scaaf.kernel._
-
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
-  }
-  
-  def reply(msg: T) = {
-    channel.reply(msg)
-  }
-  
 }
-
-trait StatelessListener[T] extends Listener[T] with StatelessService

@@ -64,6 +64,7 @@ class Receiver(connection: Connection, bind: Bind, exchange: Exchange) {
   }
   
   def receive(m: Message) {
-    bind.listener.deliver(m, exchange)
+    val channel = new Channel
+    bind.listener.deliver(m, channel)
   }
 }

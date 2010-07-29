@@ -21,16 +21,17 @@ package scaaf.cli
  *
  */
 class Arg(
-    label: String,
-    description: String,
-    repeated: Boolean,
-    klass: Class[_])
+    val label: String,
+    val description: String,
+    val repeated: Boolean,
+    val optional: Boolean,
+    val klass: Class[_])
 
-class OptionalArg(
-    abbreviation: Option[Char],
-    longName: Option[String],
+class OptionArg(
+    val abbreviation: Option[Char],
+    val longName: Option[String],
     label: String,
     description: String,
     repeated: Boolean,
     klass: Class[_]
-) extends Arg(label, description, repeated, klass)
+) extends Arg(label, description, repeated, true, klass)

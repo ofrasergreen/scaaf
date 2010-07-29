@@ -14,25 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.space
 
-package scaaf.exchange
+import sbinary._
+import DefaultProtocol._
+import Operations._
+import JavaIO._
 
-import scaaf.kernel._
+import scaaf.ObjID
 
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
-  }
-  
-  def reply(msg: T) = {
-    channel.reply(msg)
-  }
-  
+/**
+ * @author ofrasergreen
+ *
+ */
+trait SpacyFormat[T <: Spacy] {
+  def reads(in: Input, objID: ObjID): T
+  def writes(out: Output, t: T)
 }
-
-trait StatelessListener[T] extends Listener[T] with StatelessService

@@ -14,25 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.exchange
+import scaaf.space.Spacy
 
-import scaaf.kernel._
+/**
+ * @author ofrasergreen
+ *
+ */
+trait RemoteMessages extends Spacy
 
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
-  }
-  
-  def reply(msg: T) = {
-    channel.reply(msg)
-  }
-  
-}
+case class Output(str: String) extends RemoteMessages
 
-trait StatelessListener[T] extends Listener[T] with StatelessService
+case class Request(args: Array[String]) extends RemoteMessages

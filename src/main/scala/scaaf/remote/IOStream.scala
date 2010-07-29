@@ -14,25 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.remote
 
-package scaaf.exchange
+import scaaf.exchange.Address
+import scaaf.space.Space
+import scaaf.space.Spacy
+import RemoteProtocol._
+import sbinary.Operations._
 
-import scaaf.kernel._
+import java.io.ByteArrayOutputStream
+import scaaf.GUID
+import java.io.InputStream
+import java.io.OutputStream
 
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
+/**
+ * @author ofrasergreen
+ *
+ */
+class IOStream(is: InputStream, os: OutputStream) {
+  def send(obj: Spacy, address: Address) {
+    // Create and send the header
+    //val header = Header(1, UUID.randomUUID, Space.FormatRegistry.getClassID(obj.getClass), obj.uuid, address.uuid)
+    //Space.serialize(header, os)
+    
+    // Send the object
+    //Space.serialize(obj, os)
   }
-  
-  def reply(msg: T) = {
-    channel.reply(msg)
-  }
-  
 }
-
-trait StatelessListener[T] extends Listener[T] with StatelessService

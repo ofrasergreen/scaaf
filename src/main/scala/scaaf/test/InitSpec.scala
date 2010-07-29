@@ -23,11 +23,9 @@ import space.Reboot
 import kernel.Server
 import java.io.File
 import scaaf.logging._
-import scaaf.cli.IPCService
 
 object OnetimeBootstrap extends Logging {
   Log.initialize
-  IPCService.start
 }
 
 trait InitSpec extends Application {

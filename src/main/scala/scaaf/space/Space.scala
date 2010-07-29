@@ -17,7 +17,8 @@
 
 package scaaf.space
 
-import java.util.UUID
+import scaaf.GUID
+import scaaf.ObjID
 import scala.collection._
 import scaaf.logging._
 import scala.actors._
@@ -25,7 +26,7 @@ import java.io._
 import sbinary._
 import DefaultProtocol._
 import Operations._
-import JavaIO._;
+import JavaIO._
 import scala.reflect.Manifest
 import scaaf.Configuration
 import java.io.File
@@ -33,27 +34,27 @@ import java.io.File
 case class ValidationException(reason: String) extends Exception(reason) 
 
 trait Spacy {
-  val uuid: UUID = UUID.randomUUID
+  val objID: ObjID = GUID.newObjID(this.getClass)
   def valid = true
 }
 
 case class Ref[T <: Spacy](obj: T) {
   private var pobj = obj
-  private var puuid:UUID = null
+  private var pObjID:ObjID = null
   
-  def this(uuid: UUID) = { 
+  def this(objID: ObjID) = { 
     this(null.asInstanceOf[T])
-    this.puuid = uuid
+    this.pObjID = objID
   }
   
   def get = {
-    if (obj == null) pobj = Space.find[T](puuid)
+    if (obj == null) pobj = Space.find[T](pObjID)
     pobj
   }
   
-  def uuid = {
-    if (puuid == null) puuid = pobj.uuid 
-    puuid
+  def objID = {
+    if (pObjID == null) pObjID = pobj.objID 
+    pObjID
   }
 }
 
@@ -62,13 +63,8 @@ case object Stats
 case object Reboot
 case object Done
 
-trait SpacyFormat[T <: Spacy] {
-  def reads(in: Input, uuid: UUID): T
-  def writes(out: Output, t: T)
-}
-
 object Space extends Actor with Logging {
-  private val cache = mutable.Map[UUID, Spacy]()
+  private val cache = mutable.Map[ObjID, Spacy]()
   private var stats = Statistics(0)
   private val spaceDir = Configuration.varDir + File.separator + "space"
   var memOnly = false
@@ -88,7 +84,6 @@ object Space extends Actor with Logging {
         reply(stats)
         
       case Reboot =>
-        Log.info("Rebooting Space.")
         cache.clear
         stats = Statistics(0)
         if (!memOnly) {
@@ -96,19 +91,27 @@ object Space extends Actor with Logging {
           f.mkdirs
           readFromDisk("", f)
         }
-        Log.debug("Completed Space reboot. " + cache.toString)
         reply(Done)
       }
     
   }
     
   private def addToCache(obj: Spacy) = {
-    cache(obj.uuid) = obj
+    cache(obj.objID) = obj
     stats = stats copy (objectCount = stats.objectCount + 1)
+  }
+ 
+  def serialize(obj: Spacy, os: Output) {
+    val cls: Class[_] = if (obj.getClass.getName.contains("$anon$")) obj.getClass.getSuperclass else obj.getClass
+    val className = cls.getCanonicalName
+    val format = FormatRegistry.getFormat(cls).getOrElse(
+        throw new Exception("No formatter found for " + className))
+    
+    format.writes(os, obj)
   }
   
   private def writeToDisk(obj: Spacy): Unit = {
-    //Log.debug("Writing " + obj.uuid)
+    //Log.debug("Writing " + obj.guid)
     // TODO - Find a cleaner way to do this
     val cls = if (obj.getClass.getName.contains("$anon$")) obj.getClass.getSuperclass else obj.getClass
     val className = cls.getCanonicalName
@@ -117,16 +120,14 @@ object Space extends Actor with Logging {
     val dirName = spaceDir + File.separator + className.replaceAll("\\.", File.separator)
     new File(dirName).mkdirs
     
-    val file = new File(dirName + File.separator + obj.uuid.toString)
-    val format = FormatRegistry.get(cls.asInstanceOf[Class[Any]]).getOrElse(
-        throw new Exception("No formatter found for " + className))
+    val file = new File(dirName + File.separator + obj.objID.toString)
     
     // Write it
     val out = new BufferedOutputStream(new FileOutputStream(file))
-    val target = new ByteArrayOutputStream();
+    val target = new ByteArrayOutputStream()
     // TODO: Write real headers
     SpacyProtocol.HeaderFormat.writes(target, new Header(1, 1, 1))
-    format.writes(target, obj)
+    serialize(obj, target)
     try {
       out.write(target.toByteArray)
     } finally {
@@ -137,7 +138,6 @@ object Space extends Actor with Logging {
   private def readFromDisk(classPath: String, dir: File): Unit = {
     dir.listFiles.foreach(f => 
       if (f.isFile) {
-        val uuid = UUID.fromString(f.getName)
         val cls = Class.forName(classPath.substring(1)) // OPTIMIZE
         addToCache(fromFile(cls.asInstanceOf[Class[Any]], f))
       } else readFromDisk(classPath + "." + f.getName, f)
@@ -145,23 +145,38 @@ object Space extends Actor with Logging {
   }
   
   private def fromFile(cls: Class[Any], file: File): Spacy = {
-    val format = FormatRegistry.get(cls.asInstanceOf[Class[Any]]).getOrElse(
+    val format = FormatRegistry.getFormat(cls).getOrElse(
         throw new Exception("No formatter found for " + cls.getName))
     
-    val uuid = UUID.fromString(file.getName)
+    val objID = GUID.newFromString(file.getName).asInstanceOf[ObjID]
         
     val in = new BufferedInputStream(new FileInputStream(file))
     try {
       SpacyProtocol.HeaderFormat.reads(in)
-      format.reads(in, uuid)
+      format.reads(in, objID)
     } finally {
       in.close() 
     }
   }
   
-  def find[T <: Spacy](u: UUID): T = {
+  def objectFromStream[T <: Spacy](in: InputStream, objID: ObjID)(implicit m: Manifest[T]): T = {
+    val cls = Class.forName(m.toString)
+    val format = FormatRegistry.getFormat(cls).getOrElse(
+        throw new Exception("No formatter found for " + cls.getName))
+    
+    format.reads(in, objID).asInstanceOf[T]
+  }
+  
+  def objectFromStream(in: Input, objID: ObjID): Spacy = {
+    val format = FormatRegistry.getFormat(objID.cls).getOrElse(
+        throw new Exception("No formatter found for " + objID.cls))
+    
+    format.reads(in, objID)
+  }
+  
+  def find[T <: Spacy](objID: ObjID): T = {
     //Log.debug("Find " + u.toString)
-    cache(u).asInstanceOf[T]
+    cache(objID).asInstanceOf[T]
   }
   
   def find[T <: Spacy](implicit m: Manifest[T]): immutable.Set[T] = {
@@ -177,18 +192,19 @@ object Space extends Actor with Logging {
       this !? Write(obj)
       obj
     } else {
-      throw ValidationException("Validation failed when storing " + obj.getClass + " " + obj.uuid)
+      throw ValidationException("Validation failed when storing " + obj.getClass + " " + obj.objID)
     }
   }
   
   object FormatRegistry extends Logging {
-    val registry = mutable.Map[Class[Any], SpacyFormat[Spacy]]()
+    val classMap = mutable.Map[Int, SpacyFormat[Spacy]]()
     
-    def get(cls: Class[Any]) = registry.get(cls)
+    def getFormat(cls: Class[_]) = classMap.get(cls.getCanonicalName.hashCode)
+    def getFormat(clsID: Int) = classMap.get(clsID)
     
-    def register(cls: Class[Any], format: SpacyFormat[Spacy]) {
+    def register(cls: Class[_], format: SpacyFormat[Spacy]) {
       //Log.debug("Registering spacy formatter for " + cls.getName)
-      registry(cls) = format
+      classMap(cls.getCanonicalName.hashCode) = format
     }
   }
 }

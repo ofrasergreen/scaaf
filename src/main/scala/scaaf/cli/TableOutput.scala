@@ -18,12 +18,17 @@ package scaaf.cli
 
 import scaaf.space._
 import scala.collection.mutable.ListBuffer
+import java.io.PrintWriter
 
 /**
  * @author ofrasergreen
  *
  */
-case class TableOutput(rows: List[TableRowOutput]) extends CLIOutput {  
+case class TableOutput(rows: List[TableRowOutput]) extends CLIView {
+  def render(w: PrintWriter) {
+    format.foreach(row => w.println(row))
+  }
+  
   def format(): List[String] = {
     // Convert to a List[List[String]]
     if (rows.isEmpty) {

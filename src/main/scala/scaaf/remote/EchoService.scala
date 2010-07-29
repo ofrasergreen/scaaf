@@ -14,25 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.remote
 
-package scaaf.exchange
+import scaaf.exchange.StatelessListener
+import scaaf.logging.Logging
+import scaaf.space.Spacy
 
-import scaaf.kernel._
-
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
+/**
+ * @author ofrasergreen
+ *
+ */
+class EchoService extends StatelessListener[Spacy] with Logging {
+  def react = {
+    case e: EchoRequest =>
+      Log.debug("Received echo request.")
+      reply(EchoReply(e.sequenceNumber, e.data))
+    case _ =>
+      Log.debug("Unhandled query message.")
   }
-  
-  def reply(msg: T) = {
-    channel.reply(msg)
-  }
-  
 }
-
-trait StatelessListener[T] extends Listener[T] with StatelessService

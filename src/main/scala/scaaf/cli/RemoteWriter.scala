@@ -14,25 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.exchange
+import scaaf.remote.End
+import scaaf.exchange.Channel
+import scaaf.space.Spacy
 
-import scaaf.kernel._
-
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
+/**
+ * @author ofrasergreen
+ *
+ */
+class RemoteWriter(channel: Channel[Spacy]) extends java.io.Writer {
+  override def close {
+    channel.close
   }
   
-  def reply(msg: T) = {
-    channel.reply(msg)
-  }
+  override def flush {}
   
+  override def write(cbuf: Array[Char], off: Int, len: Int) {
+    val output = new Output(new String(cbuf, off, len))
+    channel.reply(output)
+  }
 }
-
-trait StatelessListener[T] extends Listener[T] with StatelessService

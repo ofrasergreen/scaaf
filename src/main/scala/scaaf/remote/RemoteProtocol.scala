@@ -16,29 +16,62 @@
  */
 package scaaf.remote
 
+import scaaf.space.Space
 import scaaf.space.SpacyProtocol
+import scaaf.space.SpacyFormat
+import scaaf.space.Spacy
 
-import java.util.UUID
+import scaaf.exchange.Address
+
+import scaaf._
 
 import sbinary._
 import DefaultProtocol._
 import Operations._
+
 
 /**
  * @author ofrasergreen
  *
  */
 object RemoteProtocol extends SpacyProtocol {
-  implicit object RemoteHeaderFormat extends Format[Header] {
-    def reads(in : Input) =  Header(read[UUID](in), read[UUID](in), read[Byte](in), 
-        read[Short](in), read[Int](in))
+  implicit object AddressFormat extends Format[Address] {
+    def reads(in : Input) =  Address.newFromAddID(read[AddID](in))    
+    def writes(out : Output, a: Address) = write(out, a.addID)
+  }
+  
+  implicit object RemoteMessageFormat extends Format[Frame] {
+    def reads(in: Input) =  {
+      val _msgID = read[MsgID](in)
+      
+      _msgID.cls match {
+        // TODO: There must be a better way than hard-coding these values
+        case -1561764041 =>
+          new Message(read[Address](in), payload(in, read[ObjID](in))) { override val msgID = _msgID }
+        case -1713209830 =>
+          new Reply(payload(in, read[ObjID](in))) { override val msgID = _msgID }
+        case 418316299 =>
+          new End()
+        case _ =>
+          throw new Exception("TODO: Handle message type: " + _msgID.cls)
+      }
+    }
     
-    def writes(out : Output, h: Header) = {
-      write(out, h.ID)
-      write(out, h.channel)
-      write(out, h.messageType)
-      write(out, h.messageClass)
-      write(out, h.size)
+    def payload(in: Input, objID: ObjID) = {
+      Space.objectFromStream(in, objID)
+    }
+            
+    def writes(out : Output, f: Frame) = {
+      write(out, f.msgID)
+      
+      if (f.isInstanceOf[Addressable]) write(out, f.asInstanceOf[Addressable].address)
+      if (f.isInstanceOf[Payloaded]) {
+        val payload = f.asInstanceOf[Payloaded].payload 
+        write(out, payload.objID)
+        Space.serialize(payload, out) // The payload
+      }
     }
   }
+  
+  
 }

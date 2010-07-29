@@ -23,7 +23,7 @@ import scala.actors.Actor
 import Actor._
 
 case class Bind(
-    val listener: Listener, 
+    val listener: Listener[Message], 
     val exchangeName: String, 
     val exchangeType: String, 
     val queueName: String, 
@@ -33,7 +33,7 @@ case class DeclareQueue(name: String, durable: Boolean)
 case class DeclareExchange(name: String, exchangeType: String, durable: Boolean)
 case class BindQueue(queueName: String, exchangeName: String, routingKey: String)
 
-class Exchange(connection: Connection) extends scaaf.exchange.Exchange with ReplySender with Actor with Logging {  
+class Exchange(connection: Connection) extends scaaf.exchange.Exchange[Message] with Actor with Logging {  
   private val thesender = new Sender(connection)
   private var receivers: List[Receiver] = List.empty
   private val channel = connection.conn.createChannel 
@@ -54,8 +54,4 @@ class Exchange(connection: Connection) extends scaaf.exchange.Exchange with Repl
       case BindQueue(queueName, exchangeName, routingKey) => channel.queueBind(queueName, exchangeName, routingKey) 
     }
   }
-  
-  def sendReply(msg: Object) = {
-    Log.debug("TODO")
-  } 
 }

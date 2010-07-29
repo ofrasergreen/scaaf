@@ -16,19 +16,11 @@
  */
 package scaaf.remote
 
-import scaaf.space.Spacy
-
-import java.util.UUID
+import scala.actors.Actor
 
 /**
  * @author ofrasergreen
  *
  */
-case class Header(
-  ID: UUID,
-  channel: UUID,
-  messageType: Byte,
-  messageClass: Short,
-  size: Int
-) extends Spacy {
+trait Handler extends Actor {
 }

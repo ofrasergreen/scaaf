@@ -14,25 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.remote
 
-package scaaf.exchange
+import scaaf.space.Spacy
+import scaaf.exchange.Address
 
-import scaaf.kernel._
+import scaaf.GUID
+import scaaf.AddID
 
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
-  }
-  
-  def reply(msg: T) = {
-    channel.reply(msg)
-  }
-  
+/**
+ * @author ofrasergreen
+ *
+ */
+trait Frame extends Spacy {
+  val msgID = GUID.newMsgID(this.getClass)
 }
 
-trait StatelessListener[T] extends Listener[T] with StatelessService
+trait Addressable {
+  val address: Address
+}
+
+trait Payloaded {
+  val payload: Spacy
+}
+
+trait ReplyOrEnd
+
+case class Message(address: Address, payload: Spacy) extends Frame with Payloaded with Addressable
+case class Reply(payload: Spacy) extends Frame with Payloaded with ReplyOrEnd
+case class Error(payload: Spacy) extends Frame with Payloaded
+case class End() extends Frame with ReplyOrEnd

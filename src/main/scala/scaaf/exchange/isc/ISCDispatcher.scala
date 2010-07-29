@@ -14,25 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.exchange.isc
 
-package scaaf.exchange
+import scaaf.remote.Frame
+import scaaf.exchange.Channel
+import scaaf.space.Spacy
 
-import scaaf.kernel._
-
-trait Listener[T] extends Service {
-  protected def react: PartialFunction[Any, Unit]
-  // FIXME: Do this better e.g. with Futures
-  private var channel: Channel[T] = null
-  
-  def deliver(msg: T, channel: Channel[T]): Unit = {
-    this.channel = channel
-    react(msg)
-  }
-  
-  def reply(msg: T) = {
-    channel.reply(msg)
-  }
-  
+/**
+ * @author ofrasergreen
+ *
+ */
+trait ISCDispatcher {
+  def deliver(frame: Frame, channel: Channel[Spacy])
 }
-
-trait StatelessListener[T] extends Listener[T] with StatelessService

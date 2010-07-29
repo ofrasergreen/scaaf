@@ -17,6 +17,8 @@
 
 package scaaf.space
 
+import scaaf._
+
 import sbinary._
 import DefaultProtocol._
 import Operations._
@@ -47,18 +49,36 @@ trait SpacyProtocol extends DefaultProtocol {
     def writes(out : Output, d: java.util.Date) = write(out, d.getTime)
   }
   
-  implicit object UUIDFormat extends Format[UUID] {
-    def reads(in : Input) = new UUID(read[Long](in), read[Long](in))
-    
-    def writes(out : Output, uuid: UUID) = {
-      write(out, uuid.getMostSignificantBits)
-      write(out, uuid.getLeastSignificantBits)
+  implicit object UUIDFormat extends Format[java.util.UUID] {
+    def reads(in : Input) =  new UUID(read[Long](in), read[Long](in))    
+    def writes(out : Output, u: java.util.UUID) = {
+      write(out, u.getMostSignificantBits)
+      write(out, u.getLeastSignificantBits)
     }
   }
   
+  trait GUIDFormat[T <: GUID] {
+    def writes(out : Output, guid: T) = {
+      write(out, guid.g._1)
+      write(out, guid.g._2)
+    }
+  }
+  
+  implicit object AddIDFormat extends Format[AddID] with GUIDFormat[AddID] {
+    def reads(in : Input) =  new AddID { override val g = (read[Long](in), read[Long](in)) } 
+  }
+  
+  implicit object MsgIDFormat extends Format[MsgID] with GUIDFormat[MsgID] {
+    def reads(in : Input) =  new MsgID { override val g = (read[Long](in), read[Long](in)) } 
+  }
+  
+  implicit object ObjIDFormat extends Format[ObjID] with GUIDFormat[ObjID] {
+    def reads(in : Input) =  new ObjID { override val g = (read[Long](in), read[Long](in)) } 
+  }
+  
   implicit def refFormat[T <: Spacy] = new Format[Ref[T]] {  
-    def reads(in : Input) = new Ref[T](read[UUID](in))
-    def writes(out : Output, v: Ref[T]) = write(out, v.uuid)
+    def reads(in : Input) = new Ref[T](read[ObjID](in))
+    def writes(out : Output, v: Ref[T]) = write(out, v.objID)
   } 
 }
 

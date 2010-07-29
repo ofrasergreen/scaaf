@@ -30,47 +30,45 @@ import DefaultProtocol._
 import Operations._
 
 import java.io._
-import java.util.UUID
 
 class Foo(val a: String, val b: Int) extends Spacy
 class Bar(val foo: Ref[Foo]) extends Spacy
 
 object FooProtocol extends SpacyProtocol {      
   implicit object FooFormat extends SpacyFormat[Foo] {
-    def reads(in : Input, u: UUID) =  {
-      read[Header](in)
+    def reads(in : Input, o: ObjID) =  {
       new Foo(read[String](in), read[Int](in)) {
-        override val uuid = u
+        override val objID = o
       }
     }
     
     def writes(out : Output, foo: Foo) = {
-      write(out, Header(1, 1, 1))
       write(out, foo.a)
       write(out, foo.b)
     }    
   }
  
   implicit object BarFormat extends SpacyFormat[Bar] {
-    def reads(in : Input, u: UUID) =  {
-      read[Header](in)
+    def reads(in : Input, o: ObjID) =  {
       new Bar(read[Ref[Foo]](in)) {
-        override val uuid = u
+        override val objID = o
       }
     }
     
     def writes(out : Output, bar: Bar) = {
-      write(out, Header(1, 1, 1))
       write(out, bar.foo)
     }
   }
 }
 
 class SpaceSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with InitSpec {
-  Space.FormatRegistry.register(classOf[Foo].asInstanceOf[Class[Any]], FooProtocol.FooFormat.asInstanceOf[SpacyFormat[Spacy]])
-  Space.FormatRegistry.register(classOf[Bar].asInstanceOf[Class[Any]], FooProtocol.BarFormat.asInstanceOf[SpacyFormat[Spacy]])
+  object Register {
+    Space.FormatRegistry.register(classOf[Foo].asInstanceOf[Class[Any]], FooProtocol.FooFormat.asInstanceOf[SpacyFormat[Spacy]])
+    Space.FormatRegistry.register(classOf[Bar].asInstanceOf[Class[Any]], FooProtocol.BarFormat.asInstanceOf[SpacyFormat[Spacy]])
+  }
 
   override def bootstrap = {
+    Register
     Space.memOnly = false
     server.bootstrap
   }
@@ -119,8 +117,8 @@ class SpaceSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with 
       Space.write(foo)
       Space.write(bar)
       Space !? Reboot
-      val bar2 = Space.find[Bar](bar.uuid)
-      assert(bar2.foo.get.uuid === foo.uuid)
+      val bar2 = Space.find[Bar](bar.objID)
+      assert(bar2.foo.get.objID === foo.objID)
       assert(bar2.foo.get.a === foo.a)
       assert(bar2.foo.get.b === foo.b)
     }
@@ -132,8 +130,8 @@ class SpaceSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with 
       val foo = new Foo("test3", 42)
       Space.write(foo)
       Space !? Reboot
-      val foo2 = Space.find[Foo](foo.uuid)
-      assert(foo.uuid === foo2.uuid)
+      val foo2 = Space.find[Foo](foo.objID)
+      assert(foo.objID === foo2.objID)
       assert(foo.a === foo2.a)
       assert(foo.b === foo2.b)
     }
@@ -145,7 +143,7 @@ class SpaceSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with 
       val results = Space.find[Foo]
       assert(results.size === 1)
       val foo2 = results.head
-      assert(foo.uuid === foo2.uuid)
+      assert(foo.objID === foo2.objID)
       assert(foo.a === foo2.a)
       assert(foo.b === foo2.b)
     }
@@ -159,7 +157,7 @@ class SpaceSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with 
       val results = Space.find[Foo]
       assert(results.size === 1)
       val foo2 = results.head
-      assert(foo.uuid === foo2.uuid)
+      assert(foo.objID === foo2.objID)
       assert(foo.a === foo2.a)
       assert(foo.b === foo2.b)
     }

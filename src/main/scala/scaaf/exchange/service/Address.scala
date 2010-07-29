@@ -14,11 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.exchange.service
 
-package scaaf.cli
+import scaaf.cluster.Node
+import scaaf.AddID
+import scaaf.GUID
 
-import scala.collection.Map
-
-trait CLIOutput {
-  def format: List[String]
+/**
+ * @author ofrasergreen
+ *
+ */
+object Address {
+  def newAddress(node: Node, listener: Class[_]) = {
+    new scaaf.exchange.Address {
+      override def addID = GUID.newAddID(Exchange.getClass, node.ID, listener.getCanonicalName.hashCode)
+    }
+  }
 }

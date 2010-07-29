@@ -14,16 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.cli
-
-import scaaf.Configuration
-import java.io.File
+package scaaf.exchange
 
 /**
  * @author ofrasergreen
  *
  */
-trait IPCConfiguration {
-  val socketFile = new File(new File(Configuration.varDir), "cli.sock")
-  val protocolVersion = "0.1"
+trait Channel[T] {
+  def reply(msg: T)
+  def close()
 }

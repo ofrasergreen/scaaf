@@ -17,8 +17,18 @@
 
 package scaaf.exchange
 
-abstract class Exchange {
+import scaaf.logging.Logging
 
+import scala.collection._
+
+trait Exchange[T] extends Logging {
+  protected val listeners = mutable.Map[Int, Listener[T]]()
+
+  def register(listener: Listener[T]) {
+    val cls = listener.getClass
+    Log.debug("Registering listener %d:%s".format(cls.getCanonicalName.hashCode, cls.getName))
+    listeners(cls.getCanonicalName.hashCode) = listener
+  }
 }
 
-abstract class Connection
+trait Connection

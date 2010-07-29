@@ -22,6 +22,8 @@ import scaaf.remote.SelectingRunner
 import scaaf.space.Space
 import scaaf.space.Reboot
 import scaaf.ApplicationRef
+import scaaf.remote.RemoteProtocol
+import scaaf.remote.EchoProtocol
 
 /**
  * @author ofrasergreen
@@ -37,11 +39,23 @@ class Server extends CLIService with Logging {
   }
   
   def bootstrap {
+    // TODO: Move this:
+    // Register protocols
+    RemoteProtocol
+    EchoProtocol
+    scaaf.cli.RemoteProtocol
+    
     // Initialize space
     Space.start
     Space !? Reboot
     
-    // Initialize CLI IPC service
+    // Initialize exchanges
+    scaaf.exchange.uds.Exchange.start
+    scaaf.exchange.isc.Exchange.start
+    scaaf.exchange.service.Exchange.start
+    scaaf.cli.Exchange.start
     
+    // Initialize listeners
+    scaaf.exchange.service.Exchange.register(new scaaf.remote.EchoService())
   }
 }

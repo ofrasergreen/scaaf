@@ -19,8 +19,8 @@ package scaaf
 import scaaf.logging._
 import scaaf.cli.Registry
 import scaaf.cli.RegistryEntry
-import scaaf.cli.Invoker
 import scaaf.cli.InvocationTarget
+import java.io.PrintWriter
 
 /**
  * The main Application trait.
@@ -44,7 +44,7 @@ trait Application extends Logging {
             List())))
     Registry.entries("server") = serverCLI
         
-    Invoker.invoke(args)
+    scaaf.cli.Exchange.invoke(args, new PrintWriter(System.out))
     //start
     //init
   }

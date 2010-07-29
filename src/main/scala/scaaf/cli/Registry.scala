@@ -27,6 +27,6 @@ object Registry extends RegistryEntry("", None) {
           "scaaf.cli.Help", 
           "help", 
           true,
-          List(new Arg("COMMAND", "COMMANDs are command and optionally sub-commands to display help about.", true, classOf[String]))
+          List(new Arg("COMMAND", "COMMANDs are command and optionally sub-commands to display help about.", true, true, classOf[String]))
       )))
 }

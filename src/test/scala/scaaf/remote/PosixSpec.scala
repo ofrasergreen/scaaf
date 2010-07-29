@@ -14,36 +14,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.cli
+package scaaf.remote
 
+import org.scalatest.WordSpec
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.MustMatchers
+import scala.collection.mutable.Stack
+import scaaf._
+import exchange._
+
+import space._
+import test._
+import java.io.File
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import scaaf.GUID
 
 import org.newsclub.net.unix.AFUNIXSocket
 import org.newsclub.net.unix.AFUNIXSocketAddress
 import org.newsclub.net.unix.AFUNIXSocketException
 
+import sbinary._
+import DefaultProtocol._
+import Operations._
+import JavaIO._
+
+
 /**
  * @author ofrasergreen
  *
  */
-class IPCClient extends IPCConfiguration with IPCSocket {
-  val sock = AFUNIXSocket.newInstance
-  sock.connect(new AFUNIXSocketAddress(socketFile))
-      
-  inputStream = sock.getInputStream
-  outputStream = sock.getOutputStream
-      
-  def handshake {
-    send(("CLI " + protocolVersion).getBytes)
-    val output = new String(receive())
-      
-    if (output != "OK")
-      throw new Exception("CLI service returned error: " + output)
-  }
+class PosixSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with InitSpec {
+  override def beforeEach = reset
+
+  "The IPC POSIX controller" should {
+    val f = new File("test" + File.separator + "ipc.sock")
     
-  def disconnect {
-    inputStream.close
-    outputStream.close
-    sock.close
+    "create a Unix Domain Socket called 'cli.sock'" in {
+      assert(f.exists === true)
+    }
+    
+    "let clients connect to the socket" in {
+      val sock = AFUNIXSocket.newInstance();
+      sock.connect(new AFUNIXSocketAddress(f));
+      sock.close
+    }
   }
 }
