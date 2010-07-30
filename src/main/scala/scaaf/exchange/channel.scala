@@ -20,7 +20,13 @@ package scaaf.exchange
  * @author ofrasergreen
  *
  */
-trait Address {  
+trait Replyable[T] {
+  def reply(msg: T)
+  def eos()
 }
 
-object NoAddress extends Address
+
+trait Channel {  
+}
+
+trait ReplyableChannel[T] extends Channel with Replyable[T] 

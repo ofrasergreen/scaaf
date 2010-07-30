@@ -16,20 +16,23 @@
  */
 package scaaf.remote
 
-import scaaf.exchange.StatelessSubscriber
+import scaaf.exchange.ReplyingSubscriber
 import scaaf.logging.Logging
 import scaaf.space.Spacy
+import scaaf.exchange.ReplyableChannel
 
 /**
  * @author ofrasergreen
  *
  */
-class EchoService extends StatelessSubscriber[Spacy] with Logging {
-  def react = {
-    case e: EchoRequest =>
-      Log.debug("Received echo request.")
-      reply(EchoReply(e.sequenceNumber, e.data))
-    case _ =>
-      Log.debug("Unhandled query message.")
+class EchoService extends ReplyingSubscriber[Spacy] with Logging {
+  def deliver(msg: Spacy, channel: ReplyableChannel[Spacy]) {
+    msg match {
+      case e: EchoRequest =>
+        Log.debug("Received echo request.")
+        channel.reply(EchoReply(e.sequenceNumber, e.data))
+      case _ =>
+        Log.debug("Unhandled query message.")
+    }
   }
 }

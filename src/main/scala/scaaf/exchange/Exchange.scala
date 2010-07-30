@@ -19,14 +19,7 @@ package scaaf.exchange
 
 import scaaf.logging.Logging
 
-import scala.collection._
-
-trait Exchange[Downstream, Upstream] extends Subscriber[Upstream] with Logging {
-  protected val subscribers = mutable.Map[Int, Subscriber[Downstream]]()
-
-  def register(subscriber: Subscriber[Downstream]) {
-    subscribers(subscriber.getClass.getCanonicalName.hashCode) = subscriber
-  }
+trait Exchange extends Logging {
 }
 
 trait Connection

@@ -46,7 +46,9 @@ class Consumer(chan: client.Channel, exchange: Exchange, subscriberID: Int) exte
         Option(props.getType),
         Option(props.getUserId))
     
-    exchange.deliver(SubscriberMessage(subscriberID, Message(envelope, properties, body)), null)
+    val messageBody = MessageBody(body)
+    
+    exchange.deliver(Message(subscriberID, envelope, properties, messageBody))
     chan.basicAck(envelope.deliveryTag, false)
   }
 }

@@ -22,11 +22,5 @@ import scaaf.logging.Logging
  * @author ofrasergreen
  *
  */
-class Channel(exchange: Exchange) extends scaaf.exchange.Channel[Message] with Logging {
-  def reply(msg: Message) {
-    exchange.send(msg)
-  } 
-  
-  def close() {   
-  }
+class Channel(val sendersAddress: Address) extends scaaf.exchange.Channel with Logging {
 }

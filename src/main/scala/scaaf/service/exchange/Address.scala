@@ -26,7 +26,7 @@ import scaaf.GUID
  */
 object Address {
   def newAddress(node: Node, subscriber: Class[_]) = {
-    new scaaf.exchange.Address {
+    new scaaf.isc.exchange.Address {
       override def addID = GUID.newAddID(Exchange.getClass, node.ID, subscriber.getCanonicalName.hashCode)
     }
   }

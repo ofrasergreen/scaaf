@@ -20,6 +20,11 @@ package scaaf.exchange
 import scaaf.kernel._
 
 trait Subscriber[T] extends Service {
-  def deliver(msg: T, channel: Channel[T])
+  //def deliver(channel: Channel): PartialFunction[T, Unit]
+  def deliver(msg: T, channel: Channel)
 }
 
+trait ReplyingSubscriber[T] extends Subscriber[T] {
+  def deliver(msg: T, channel: Channel) = deliver(msg: T, channel.asInstanceOf[ReplyableChannel[T]])
+  def deliver(msg: T, replyableChannel: ReplyableChannel[T])
+}

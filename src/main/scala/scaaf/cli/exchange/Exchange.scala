@@ -17,7 +17,7 @@
 package scaaf.cli.exchange
 
 import scaaf.logging.Logging
-import scaaf.exchange.Channel
+import scaaf.exchange.ReplyableChannel
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
@@ -41,14 +41,12 @@ import java.io.BufferedWriter
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange[Spacy, Envelope] with Logging {
-  def address = new scaaf.exchange.Address {
+object Exchange extends scaaf.exchange.Exchange with scaaf.exchange.ReplyingSubscriber[Envelope] with Logging {
+  def address = new scaaf.isc.exchange.Address {
     override def addID = GUID.newAddID(Exchange.getClass, LocalNode.ID, 0)
   }
 
-  println("exchange addr: " + address.addID)
-  
-  def deliver(env: Envelope, channel: Channel[Envelope]) {
+  def deliver(env: Envelope, channel: ReplyableChannel[Envelope]) {
     // Create a buffered 1k print writer which will return messages
     val writer = new PrintWriter(new BufferedWriter(new RemoteWriter(channel), 1024)) 
     env.spacy match {

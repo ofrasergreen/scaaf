@@ -17,7 +17,7 @@
 package scaaf.remote
 
 import scaaf.space.Spacy
-import scaaf.exchange.Address
+import scaaf.isc.exchange.Address
 
 import scaaf.GUID
 import scaaf.AddID

@@ -56,7 +56,7 @@ class ProtocolSpec extends WordSpec with MustMatchers with BeforeAndAfterEach wi
     
     // Create a stream and send an echo request on it
     val data = Array[Byte](1, 2, 3, 4, 5)
-    val address = Address.newFromDetails(scaaf.service.exchange.Exchange, LocalNode, classOf[EchoService].getCanonicalName.hashCode)
+    val address = scaaf.isc.exchange.Address.newFromDetails(scaaf.service.exchange.Exchange, LocalNode, classOf[EchoService].getCanonicalName.hashCode)
     val request = EchoRequest(1, data)
     
     // Create the message

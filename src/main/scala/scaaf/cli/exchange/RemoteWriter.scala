@@ -16,7 +16,7 @@
  */
 package scaaf.cli.exchange
 
-import scaaf.exchange.Channel
+import scaaf.exchange.ReplyableChannel
 import scaaf.space.Spacy
 import scaaf.isc.exchange.Envelope
 
@@ -24,9 +24,9 @@ import scaaf.isc.exchange.Envelope
  * @author ofrasergreen
  *
  */
-class RemoteWriter(channel: Channel[Envelope]) extends java.io.Writer {
+class RemoteWriter(channel: ReplyableChannel[Envelope]) extends java.io.Writer {
   override def close {
-    channel.close
+    channel.eos
   }
   
   override def flush {}

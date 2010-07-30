@@ -20,19 +20,18 @@ import scaaf.logging.Logging
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
-import scaaf.exchange.Subscriber
+import scaaf.exchange.ReplyingSubscriber
+import scaaf.exchange.Subscribable
 import scaaf.space.Spacy
 import scaaf.isc.exchange.Envelope
-
-import scala.actors.Actor
-import Actor._
+import scaaf.exchange.ReplyableChannel
 
 /**
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange[Spacy, Envelope] with Logging {
-  def deliver(env: Envelope, channel: scaaf.exchange.Channel[Envelope]) { 
+object Exchange extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscriber[Spacy]] with ReplyingSubscriber[Envelope] with Logging {
+  def deliver(env: Envelope, channel: scaaf.exchange.ReplyableChannel[Envelope]) { 
     Log.debug("Dispatching service to " + env.destination)
     val subscriber = subscribers(env.destination.toInt)
     subscriber.deliver(env.spacy, new Channel(channel))

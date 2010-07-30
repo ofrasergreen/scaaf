@@ -18,12 +18,13 @@ package scaaf.service.exchange
 
 import scaaf.isc.exchange.Envelope
 import scaaf.space.Spacy
+import scaaf.exchange.ReplyableChannel
 
 /**
  * @author ofrasergreen
  *
  */
-class Channel(upstream: scaaf.exchange.Channel[Envelope]) extends scaaf.exchange.Channel[Spacy] {
+class Channel(upstream: ReplyableChannel[Envelope]) extends ReplyableChannel[Spacy] {
   def reply(spacy: Spacy) = upstream.reply(new Envelope(0L, spacy))
-  def close() = upstream.close
+  def eos() = upstream.eos
 }

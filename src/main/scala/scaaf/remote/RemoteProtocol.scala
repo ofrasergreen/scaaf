@@ -21,7 +21,7 @@ import scaaf.space.SpacyProtocol
 import scaaf.space.SpacyFormat
 import scaaf.space.Spacy
 
-import scaaf.exchange.Address
+import scaaf.isc.exchange.Address
 
 import scaaf._
 

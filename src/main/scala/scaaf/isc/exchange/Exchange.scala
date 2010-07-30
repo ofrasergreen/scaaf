@@ -18,9 +18,11 @@ package scaaf.isc.exchange
 
 import scaaf.logging.Logging
 import scaaf.exchange.Subscriber
+import scaaf.exchange.Subscribable
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
+import scaaf.exchange.ReplyableChannel
 
 
 
@@ -28,8 +30,8 @@ import scaaf.remote.Message
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange[Envelope, Frame] with Logging {
-  def deliver(frame: Frame, channel: scaaf.exchange.Channel[Frame]) {
+object Exchange extends scaaf.exchange.Exchange with Subscribable[Subscriber[Envelope]] with Logging {
+  def deliver(frame: Frame, channel: ReplyableChannel[Frame]) {
     frame match {
       case m: Message => 
         // TODO: Examine the node ID

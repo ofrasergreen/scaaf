@@ -20,7 +20,6 @@ package scaaf.exchange
  * @author ofrasergreen
  *
  */
-trait Address {  
+trait Publisher[M, A] {
+  def send(address: A, msg: M)
 }
-
-object NoAddress extends Address

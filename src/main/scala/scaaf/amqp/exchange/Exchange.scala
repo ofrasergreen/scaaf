@@ -17,7 +17,8 @@
 
 package scaaf.amqp.exchange
 
-import scaaf.exchange.Subscriber
+import scaaf.exchange.ReplyingSubscriber
+import scaaf.exchange.Subscribable
 import scaaf.logging.Logging
 
 import com.rabbitmq._
@@ -27,7 +28,7 @@ class Exchange(hostName: String,
     portNumber: Int, 
     userName: String,
     password: String,
-    virtualHost: String) extends scaaf.exchange.Exchange[Message, SubscriberMessage] with Logging {
+    virtualHost: String) extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscriber[MessageBody]] with scaaf.exchange.Publisher[MessageBody, Address] with Logging {
   
   // Connect to the AMQP server
   val conn = {
@@ -46,13 +47,13 @@ class Exchange(hostName: String,
   private val connection = new Connection(conn.createChannel)
   connection.start  
     
-  def send(message: Message) {
-    Log.debug("Sending message of type '%s' to exchange '%s' with key '%s'".format(message.properties.messageType.getOrElse(""), message.envelope.exchange, message.envelope.routingKey))
-    connection ! Publish(message)
+  def send(address: Address, body: MessageBody) {
+    Log.debug("Sending message of type '%s' to exchange '%s' with key '%s'".format(address.properties.messageType.getOrElse(""), address.envelope.exchange, address.envelope.routingKey))
+    connection ! Publish(address, body)
   }
   
-  def deliver(msg: SubscriberMessage, channel: scaaf.exchange.Channel[SubscriberMessage]) {
-    subscribers(msg.subscriberID).deliver(msg.message, new Channel(this))
+  def deliver(msg: Message) {
+    subscribers(msg.subscriberID).deliver(msg.body, new Channel(Address(msg.envelope, msg.properties)))
   }
   
   def register(
@@ -60,7 +61,7 @@ class Exchange(hostName: String,
       exchangeType: String, 
       queueName: String, 
       routingKey: String, 
-      subscriber: Subscriber[Message]) {
+      subscriber: ReplyingSubscriber[MessageBody]) {
     // register the subscriber in the normal way
     register(subscriber)
 

@@ -16,11 +16,17 @@
  */
 package scaaf.exchange
 
+import scala.collection._
+
+
 /**
  * @author ofrasergreen
  *
  */
-trait Channel[T] {
-  def reply(msg: T)
-  def close()
+trait Subscribable[T <: Subscriber[_]] {
+  protected val subscribers = mutable.Map[Int, T]()
+
+  def register(subscriber: T) {
+    subscribers(subscriber.getClass.getCanonicalName.hashCode) = subscriber
+  }
 }

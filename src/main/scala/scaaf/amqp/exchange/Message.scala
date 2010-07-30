@@ -42,8 +42,10 @@ case class Properties(
     val timestamp: Option[java.util.Date],
     val messageType: Option[String],
     val userId: Option[String])      
-  
-case class Message(envelope: Envelope, properties: Properties, body: Array[Byte])
+ 
+case class MessageBody(bytes: Array[Byte])
+    
+case class Message(subscriberID: Int, envelope: Envelope, properties: Properties, body: MessageBody)
 
 object EmptyProperties extends Properties(
     None,
@@ -62,5 +64,3 @@ object EmptyProperties extends Properties(
     None,
     None,
     None)
-
-case class SubscriberMessage(subscriberID: Int, message: Message)
