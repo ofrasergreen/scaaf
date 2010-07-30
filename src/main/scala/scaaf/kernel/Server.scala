@@ -19,8 +19,6 @@ package scaaf.kernel
 import scaaf.cli.CLIService
 import scaaf.logging.Logging
 import scaaf.remote.SelectingRunner
-import scaaf.space.Space
-import scaaf.space.Reboot
 import scaaf.ApplicationRef
 
 /**
@@ -29,34 +27,8 @@ import scaaf.ApplicationRef
  */
 class Server extends CLIService with Logging {
   def start() {
-    Log.info("Bootstrapping...")
-    bootstrap
-    SelectingRunner.start
+    //SelectingRunner.start
     Log.info("Server started")
     ApplicationRef.application.init
-  }
-  
-  def bootstrap {
-    // TODO: Move this:
-    // Register protocols
-    scaaf.remote.RemoteProtocol
-    scaaf.remote.EchoProtocol
-    scaaf.cli.exchange.RemoteProtocol
-    
-    // Initialize space
-    Space.start
-    Space !? Reboot
-    
-    // Initialize exchanges
-    scaaf.ipc.uds.exchange.Exchange
-    scaaf.isc.exchange.Exchange
-    scaaf.service.exchange.Exchange
-    scaaf.cli.exchange.Exchange
-    
-    // Initialize subscribers
-    scaaf.service.exchange.Exchange.register(new scaaf.remote.EchoService())
-    scaaf.isc.exchange.Exchange.register(scaaf.cli.exchange.Exchange)
-    scaaf.isc.exchange.Exchange.register(scaaf.service.exchange.Exchange)
-
   }
 }

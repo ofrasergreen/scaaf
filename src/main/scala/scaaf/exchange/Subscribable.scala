@@ -27,6 +27,6 @@ trait Subscribable[T <: Subscriber[_]] {
   protected val subscribers = mutable.Map[Int, T]()
 
   def register(subscriber: T) {
-    subscribers(subscriber.getClass.getCanonicalName.hashCode) = subscriber
+    subscribers(subscriber.hashCode) = subscriber
   }
 }

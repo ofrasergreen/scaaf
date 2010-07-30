@@ -70,7 +70,7 @@ class SpaceSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with 
   override def bootstrap = {
     Register
     Space.memOnly = false
-    server.bootstrap
+    scaaf.kernel.Bootstrap
   }
   
   def deleteAll(dir: File): Unit = {

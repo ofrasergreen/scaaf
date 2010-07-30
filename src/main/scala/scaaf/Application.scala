@@ -34,6 +34,10 @@ trait Application extends Logging {
     // Initialize the logger
     Log.initialize
     
+    // Bootstrap
+    Log.info("Bootstrapping...")
+    scaaf.kernel.Bootstrap
+    
     // Add the server CLI (TODO: Find a better place for this)
     val serverCLI = new RegistryEntry("view or change the state of the server", None)
     serverCLI.entries("start") = new RegistryEntry("start the server", Some(

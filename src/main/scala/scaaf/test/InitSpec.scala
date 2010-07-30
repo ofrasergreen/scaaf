@@ -36,7 +36,7 @@ trait InitSpec extends Application {
   
   def bootstrap {
     Space.memOnly = true
-    server.bootstrap
+    scaaf.kernel.Bootstrap
   }
   
   def reset {

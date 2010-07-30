@@ -72,7 +72,7 @@ class Exchange(hostName: String,
     chan.queueBind(queueName, exchangeName, routingKey)
     
     // Create a consumer
-    chan.basicConsume(queueName, true, new Consumer(chan, this, subscriber.getClass.getCanonicalName.hashCode))
+    chan.basicConsume(queueName, true, new Consumer(chan, this, subscriber.hashCode))
   }
   
   def declareQueue(name: String, durable: Boolean) { connection ! DeclareQueue(name, durable)}

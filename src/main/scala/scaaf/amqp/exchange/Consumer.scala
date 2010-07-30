@@ -21,8 +21,11 @@ import scala.collection.JavaConversions._
 import scala.actors.Actor
 import Actor._
 import com.rabbitmq._
+import scaaf.logging.Logging
 
-class Consumer(chan: client.Channel, exchange: Exchange, subscriberID: Int) extends client.DefaultConsumer(chan) {
+class Consumer(chan: client.Channel, exchange: Exchange, subscriberID: Int) extends client.DefaultConsumer(chan) with Logging {
+  Log.debug("Registered AMQP handler for subscriber " + subscriberID)
+  
   override def handleDelivery(consumerTag: String, env: client.Envelope, props: client.AMQP.BasicProperties, body: Array[Byte]) {
     // Get the envelope
     val envelope = new Envelope(env.getExchange, env.getRoutingKey, env.getDeliveryTag, env.isRedeliver)
