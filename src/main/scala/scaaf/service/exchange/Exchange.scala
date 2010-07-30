@@ -20,7 +20,7 @@ import scaaf.logging.Logging
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
-import scaaf.exchange.Listener
+import scaaf.exchange.Subscriber
 import scaaf.space.Spacy
 import scaaf.isc.exchange.Envelope
 
@@ -34,7 +34,7 @@ import Actor._
 object Exchange extends scaaf.exchange.Exchange[Spacy, Envelope] with Logging {
   def deliver(env: Envelope, channel: scaaf.exchange.Channel[Envelope]) { 
     Log.debug("Dispatching service to " + env.destination)
-    val listener = listeners(env.destination.toInt)
-    listener.deliver(env.spacy, new Channel(channel))
+    val subscriber = subscribers(env.destination.toInt)
+    subscriber.deliver(env.spacy, new Channel(channel))
   }
 }

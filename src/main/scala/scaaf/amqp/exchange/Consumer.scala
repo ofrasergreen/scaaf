@@ -22,7 +22,7 @@ import scala.actors.Actor
 import Actor._
 import com.rabbitmq._
 
-class Consumer(chan: client.Channel, exchange: Exchange, listenerID: Int) extends client.DefaultConsumer(chan) {
+class Consumer(chan: client.Channel, exchange: Exchange, subscriberID: Int) extends client.DefaultConsumer(chan) {
   override def handleDelivery(consumerTag: String, env: client.Envelope, props: client.AMQP.BasicProperties, body: Array[Byte]) {
     // Get the envelope
     val envelope = new Envelope(env.getExchange, env.getRoutingKey, env.getDeliveryTag, env.isRedeliver)
@@ -46,7 +46,7 @@ class Consumer(chan: client.Channel, exchange: Exchange, listenerID: Int) extend
         Option(props.getType),
         Option(props.getUserId))
     
-    exchange.deliver(ListenerMessage(listenerID, Message(envelope, properties, body)), null)
+    exchange.deliver(SubscriberMessage(subscriberID, Message(envelope, properties, body)), null)
     chan.basicAck(envelope.deliveryTag, false)
   }
 }

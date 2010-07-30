@@ -72,7 +72,7 @@ object Address {
   //private var paddID: AddID = null
   
   //def addID: AddID = {
-  //  if (paddID == null) paddID = GUID.newAddID(ExchangeRegistry.getID(exchange.getClass), listener.getClass, false)
+  //  if (paddID == null) paddID = GUID.newAddID(ExchangeRegistry.getID(exchange.getClass), subscriber.getClass, false)
   //  paddID
   //}
   

@@ -21,11 +21,11 @@ import scaaf.logging.Logging
 
 import scala.collection._
 
-trait Exchange[Downstream, Upstream] extends Listener[Upstream] with Logging {
-  protected val listeners = mutable.Map[Int, Listener[Downstream]]()
+trait Exchange[Downstream, Upstream] extends Subscriber[Upstream] with Logging {
+  protected val subscribers = mutable.Map[Int, Subscriber[Downstream]]()
 
-  def register(listener: Listener[Downstream]) {
-    listeners(listener.getClass.getCanonicalName.hashCode) = listener
+  def register(subscriber: Subscriber[Downstream]) {
+    subscribers(subscriber.getClass.getCanonicalName.hashCode) = subscriber
   }
 }
 

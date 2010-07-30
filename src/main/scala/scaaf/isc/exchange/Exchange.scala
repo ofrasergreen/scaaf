@@ -17,7 +17,7 @@
 package scaaf.isc.exchange
 
 import scaaf.logging.Logging
-import scaaf.exchange.Listener
+import scaaf.exchange.Subscriber
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
@@ -38,8 +38,8 @@ object Exchange extends scaaf.exchange.Exchange[Envelope, Frame] with Logging {
         
         // TODO: Look up the exchange ClsID from the Exchange ID, then find 
         // it in the extension point register
-        println(listeners)
-        val exchange = listeners(m.address.addID.cls)
+        println(subscribers)
+        val exchange = subscribers(m.address.addID.cls)
         val chan = new Channel(channel)
         exchange.deliver(Envelope(m.address.addID.data, m.payload), chan)
     }

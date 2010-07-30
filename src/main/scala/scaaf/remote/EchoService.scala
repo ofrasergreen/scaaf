@@ -16,7 +16,7 @@
  */
 package scaaf.remote
 
-import scaaf.exchange.StatelessListener
+import scaaf.exchange.StatelessSubscriber
 import scaaf.logging.Logging
 import scaaf.space.Spacy
 
@@ -24,7 +24,7 @@ import scaaf.space.Spacy
  * @author ofrasergreen
  *
  */
-class EchoService extends StatelessListener[Spacy] with Logging {
+class EchoService extends StatelessSubscriber[Spacy] with Logging {
   def react = {
     case e: EchoRequest =>
       Log.debug("Received echo request.")

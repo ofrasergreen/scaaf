@@ -53,7 +53,7 @@ class Server extends CLIService with Logging {
     scaaf.service.exchange.Exchange
     scaaf.cli.exchange.Exchange
     
-    // Initialize listeners
+    // Initialize subscribers
     scaaf.service.exchange.Exchange.register(new scaaf.remote.EchoService())
     scaaf.isc.exchange.Exchange.register(scaaf.cli.exchange.Exchange)
     scaaf.isc.exchange.Exchange.register(scaaf.service.exchange.Exchange)

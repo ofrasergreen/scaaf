@@ -20,7 +20,7 @@ import scala.actors.Actor
 import Actor._
 
 import scaaf.exchange.Exchange
-import scaaf.exchange.Listener
+import scaaf.exchange.Subscriber
 
 import java.security._
 import scaaf.cluster.LocalNode

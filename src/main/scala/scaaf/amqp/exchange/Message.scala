@@ -63,4 +63,4 @@ object EmptyProperties extends Properties(
     None,
     None)
 
-case class ListenerMessage(listenerID: Int, message: Message)
+case class SubscriberMessage(subscriberID: Int, message: Message)

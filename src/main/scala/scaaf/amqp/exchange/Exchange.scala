@@ -17,7 +17,7 @@
 
 package scaaf.amqp.exchange
 
-import scaaf.exchange.Listener
+import scaaf.exchange.Subscriber
 import scaaf.logging.Logging
 
 import com.rabbitmq._
@@ -27,7 +27,7 @@ class Exchange(hostName: String,
     portNumber: Int, 
     userName: String,
     password: String,
-    virtualHost: String) extends scaaf.exchange.Exchange[Message, ListenerMessage] with Logging {
+    virtualHost: String) extends scaaf.exchange.Exchange[Message, SubscriberMessage] with Logging {
   
   // Connect to the AMQP server
   val conn = {
@@ -51,8 +51,8 @@ class Exchange(hostName: String,
     connection ! Publish(message)
   }
   
-  def deliver(msg: ListenerMessage, channel: scaaf.exchange.Channel[ListenerMessage]) {
-    listeners(msg.listenerID).deliver(msg.message, new Channel(this))
+  def deliver(msg: SubscriberMessage, channel: scaaf.exchange.Channel[SubscriberMessage]) {
+    subscribers(msg.subscriberID).deliver(msg.message, new Channel(this))
   }
   
   def register(
@@ -60,9 +60,9 @@ class Exchange(hostName: String,
       exchangeType: String, 
       queueName: String, 
       routingKey: String, 
-      listener: Listener[Message]) {
-    // register the listener in the normal way
-    register(listener)
+      subscriber: Subscriber[Message]) {
+    // register the subscriber in the normal way
+    register(subscriber)
 
     // Create a channel to consume on
     val chan = conn.createChannel
@@ -71,6 +71,6 @@ class Exchange(hostName: String,
     chan.queueBind(queueName, exchangeName, routingKey)
     
     // Create a consumer
-    chan.basicConsume(queueName, true, new Consumer(chan, this, listener.getClass.getCanonicalName.hashCode))
+    chan.basicConsume(queueName, true, new Consumer(chan, this, subscriber.getClass.getCanonicalName.hashCode))
   }
 }
