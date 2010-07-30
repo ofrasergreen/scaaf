@@ -20,6 +20,6 @@ package scaaf.exchange
  * @author ofrasergreen
  *
  */
-trait Publisher[M, A] {
+trait Publisher[A, M] {
   def send(address: A, msg: M)
 }

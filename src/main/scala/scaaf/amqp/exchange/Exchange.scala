@@ -17,7 +17,7 @@
 
 package scaaf.amqp.exchange
 
-import scaaf.exchange.ReplyingSubscriber
+import scaaf.exchange.Subscriber
 import scaaf.exchange.Subscribable
 import scaaf.logging.Logging
 
@@ -28,7 +28,7 @@ class Exchange(hostName: String,
     portNumber: Int, 
     userName: String,
     password: String,
-    virtualHost: String) extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscriber[MessageBody]] with scaaf.exchange.Publisher[MessageBody, Address] with Logging {
+    virtualHost: String) extends scaaf.exchange.Exchange with Subscribable[Subscriber[MessageBody]] with scaaf.exchange.Publisher[Address, MessageBody] with Logging {
   
   // Connect to the AMQP server
   val conn = {
@@ -61,7 +61,7 @@ class Exchange(hostName: String,
       exchangeType: String, 
       queueName: String, 
       routingKey: String, 
-      subscriber: ReplyingSubscriber[MessageBody]) {
+      subscriber: Subscriber[MessageBody]) {
     // register the subscriber in the normal way
     register(subscriber)
 
@@ -74,4 +74,8 @@ class Exchange(hostName: String,
     // Create a consumer
     chan.basicConsume(queueName, true, new Consumer(chan, this, subscriber.getClass.getCanonicalName.hashCode))
   }
+  
+  def declareQueue(name: String, durable: Boolean) { connection ! DeclareQueue(name, durable)}
+  def declareExchange(name: String, exchangeType: String, durable: Boolean) { connection ! DeclareExchange(name, exchangeType, durable)}
+  def bindQueue(queueName: String, exchangeName: String, routingKey: String) { connection ! BindQueue(queueName, exchangeName, routingKey)}
 }
