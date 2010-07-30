@@ -14,15 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange.uds
+package scaaf.ipc.uds.exchange
 
-import java.io.File
+import scaaf.space.Spacy
+import scaaf.remote.Frame
 
 /**
  * @author ofrasergreen
  *
  */
-trait Configuration {
-  System.setProperty("org.newsclub.net.unix.library.path", scaaf.Configuration.libDir)
-  val socketFile = new File(new File(scaaf.Configuration.varDir), "ipc.sock")
+class Channel(connection: Connection) extends scaaf.exchange.Channel[Frame] {
+  def reply(frame: Frame) = connection ! Write(frame)
+  def close() = connection ! Close
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package scaaf.exchange.amqp
+package scaaf.amqp.exchange
 
 case class Envelope (
     val exchange: String, 

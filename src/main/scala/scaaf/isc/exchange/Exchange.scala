@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange.isc
+package scaaf.isc.exchange
 
 import scaaf.logging.Logging
 import scaaf.exchange.Listener

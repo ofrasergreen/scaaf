@@ -31,7 +31,7 @@ import JavaIO._
  * @author ofrasergreen
  *
  */
-class IPCClient extends scaaf.exchange.uds.Configuration {
+class IPCClient extends scaaf.ipc.uds.exchange.Configuration {
   val sock = AFUNIXSocket.newInstance
   sock.connect(new AFUNIXSocketAddress(socketFile))
       

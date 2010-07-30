@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange.service
+package scaaf.amqp.exchange
 
-import scaaf.exchange.isc.Envelope
-import scaaf.space.Spacy
+import scaaf.logging.Logging
 
 /**
  * @author ofrasergreen
  *
  */
-class Channel(upstream: scaaf.exchange.Channel[Envelope]) extends scaaf.exchange.Channel[Spacy] {
-  def reply(spacy: Spacy) = upstream.reply(new Envelope(0L, spacy))
-  def close() = upstream.close
+class Channel(exchange: Exchange) extends scaaf.exchange.Channel[Message] with Logging {
+  def reply(msg: Message) {
+    exchange.send(msg)
+  } 
+  
+  def close() {   
+  }
 }

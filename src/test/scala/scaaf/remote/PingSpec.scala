@@ -50,7 +50,7 @@ class PingSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with I
   "The echo service" should {
     "respond to an echo request with an echo reply" in {
       // Create the message
-      val address = scaaf.exchange.service.Address.newAddress(LocalNode, classOf[EchoService])
+      val address = scaaf.service.exchange.Address.newAddress(LocalNode, classOf[EchoService])
       val data = Array[Byte](1, 2, 3, 4, 5)
       val request = EchoRequest(1, data)
       val message = Message(address, request)

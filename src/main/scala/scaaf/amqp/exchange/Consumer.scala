@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package scaaf.exchange.amqp
+package scaaf.amqp.exchange
 
 import scala.collection.JavaConversions._
 import scala.actors.Actor

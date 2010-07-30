@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange.uds
+package scaaf.ipc.uds.exchange
 
 import scaaf.logging.Logging
 import scaaf.remote.Frame
@@ -59,6 +59,6 @@ object Exchange extends scaaf.exchange.Exchange[Frame, Frame] with Actor with Lo
   def deliver(frame: Frame, channel: scaaf.exchange.Channel[Frame]) {
     // Pass everything along to the ISC exchange
     // TODO: This should act as an extension to the ISC exchange, not invoke it directly.
-    scaaf.exchange.isc.Exchange.deliver(frame, channel)
+    scaaf.isc.exchange.Exchange.deliver(frame, channel)
   }
 }

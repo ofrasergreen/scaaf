@@ -14,20 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange.service
+package scaaf.ipc.uds.exchange
 
-import scaaf.cluster.Node
-import scaaf.AddID
-import scaaf.GUID
+import java.io.File
 
 /**
  * @author ofrasergreen
  *
  */
-object Address {
-  def newAddress(node: Node, listener: Class[_]) = {
-    new scaaf.exchange.Address {
-      override def addID = GUID.newAddID(Exchange.getClass, node.ID, listener.getCanonicalName.hashCode)
-    }
-  }
+trait Configuration {
+  System.setProperty("org.newsclub.net.unix.library.path", scaaf.Configuration.libDir)
+  val socketFile = new File(new File(scaaf.Configuration.varDir), "ipc.sock")
 }

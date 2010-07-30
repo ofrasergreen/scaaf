@@ -44,7 +44,7 @@ trait Application extends Logging {
             List())))
     Registry.entries("server") = serverCLI
         
-    scaaf.cli.Exchange.invoke(args, new PrintWriter(System.out))
+    scaaf.cli.exchange.Exchange.invoke(args, new PrintWriter(System.out))
     //start
     //init
   }

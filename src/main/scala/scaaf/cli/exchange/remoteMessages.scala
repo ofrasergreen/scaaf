@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange.uds
+package scaaf.cli.exchange
 
 import scaaf.space.Spacy
-import scaaf.remote.Frame
 
 /**
  * @author ofrasergreen
  *
  */
-class Channel(connection: Connection) extends scaaf.exchange.Channel[Frame] {
-  def reply(frame: Frame) = connection ! Write(frame)
-  def close() = connection ! Close
-}
+trait RemoteMessages extends Spacy
+
+case class Output(str: String) extends RemoteMessages
+
+case class Request(args: Array[String]) extends RemoteMessages

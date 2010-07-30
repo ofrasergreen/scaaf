@@ -14,20 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange.isc
+package scaaf.service.exchange
 
-import scaaf.remote.Frame
-import scaaf.remote.Reply
-import scaaf.remote.End
+import scaaf.isc.exchange.Envelope
+import scaaf.space.Spacy
 
 /**
  * @author ofrasergreen
  *
  */
-class Channel(upstream: scaaf.exchange.Channel[Frame]) extends scaaf.exchange.Channel[Envelope] {
-  def reply(env: Envelope) = upstream.reply(new Reply(env.spacy))
-  def close() = {
-    upstream.reply(new End())
-    upstream.close
-  }
+class Channel(upstream: scaaf.exchange.Channel[Envelope]) extends scaaf.exchange.Channel[Spacy] {
+  def reply(spacy: Spacy) = upstream.reply(new Envelope(0L, spacy))
+  def close() = upstream.close
 }

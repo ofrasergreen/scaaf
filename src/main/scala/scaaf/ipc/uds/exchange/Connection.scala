@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange.uds
+package scaaf.ipc.uds.exchange
 
 import scaaf.logging.Logging
 import scaaf.remote.RemoteProtocol

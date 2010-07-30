@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.cli
+package scaaf.cli.exchange
 
 import scaaf.logging.Logging
 import scaaf.exchange.Channel
@@ -25,7 +25,8 @@ import scaaf.remote.End
 import scaaf.GUID
 import scaaf.Configuration
 import scaaf.cluster.LocalNode
-import scaaf.exchange.isc.Envelope
+import scaaf.isc.exchange.Envelope
+import scaaf.cli._
 
 import scala.collection.mutable.ListBuffer
 import scala.actors.Actor

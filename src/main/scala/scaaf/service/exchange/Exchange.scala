@@ -14,16 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.cli
+package scaaf.service.exchange
 
+import scaaf.logging.Logging
+
+import scaaf.remote.Frame
+import scaaf.remote.Message
+import scaaf.exchange.Listener
 import scaaf.space.Spacy
+import scaaf.isc.exchange.Envelope
+
+import scala.actors.Actor
+import Actor._
 
 /**
  * @author ofrasergreen
  *
  */
-trait RemoteMessages extends Spacy
-
-case class Output(str: String) extends RemoteMessages
-
-case class Request(args: Array[String]) extends RemoteMessages
+object Exchange extends scaaf.exchange.Exchange[Spacy, Envelope] with Logging {
+  def deliver(env: Envelope, channel: scaaf.exchange.Channel[Envelope]) { 
+    Log.debug("Dispatching service to " + env.destination)
+    val listener = listeners(env.destination.toInt)
+    listener.deliver(env.spacy, new Channel(channel))
+  }
+}
