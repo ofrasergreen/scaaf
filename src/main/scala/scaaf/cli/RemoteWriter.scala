@@ -16,15 +16,15 @@
  */
 package scaaf.cli
 
-import scaaf.remote.End
 import scaaf.exchange.Channel
 import scaaf.space.Spacy
+import scaaf.exchange.isc.Envelope
 
 /**
  * @author ofrasergreen
  *
  */
-class RemoteWriter(channel: Channel[Spacy]) extends java.io.Writer {
+class RemoteWriter(channel: Channel[Envelope]) extends java.io.Writer {
   override def close {
     channel.close
   }
@@ -33,6 +33,6 @@ class RemoteWriter(channel: Channel[Spacy]) extends java.io.Writer {
   
   override def write(cbuf: Array[Char], off: Int, len: Int) {
     val output = new Output(new String(cbuf, off, len))
-    channel.reply(output)
+    channel.reply(Envelope(0, output))
   }
 }

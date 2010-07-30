@@ -50,12 +50,15 @@ class Server extends CLIService with Logging {
     Space !? Reboot
     
     // Initialize exchanges
-    scaaf.exchange.uds.Exchange.start
-    scaaf.exchange.isc.Exchange.start
-    scaaf.exchange.service.Exchange.start
-    scaaf.cli.Exchange.start
+    scaaf.exchange.uds.Exchange
+    scaaf.exchange.isc.Exchange
+    scaaf.exchange.service.Exchange
+    scaaf.cli.Exchange
     
     // Initialize listeners
     scaaf.exchange.service.Exchange.register(new scaaf.remote.EchoService())
+    scaaf.exchange.isc.Exchange.register(scaaf.cli.Exchange)
+    scaaf.exchange.isc.Exchange.register(scaaf.exchange.service.Exchange)
+
   }
 }

@@ -17,33 +17,19 @@
 package scaaf.exchange.isc
 
 import scaaf.logging.Logging
-import scaaf.exchange.ExchangeRegistry
-import scaaf.exchange.Channel
-import scaaf.space.Spacy
+import scaaf.exchange.Listener
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
 
 
-import scala.actors.Actor
-import Actor._
 
 /**
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange[Frame] with Actor with Logging {
-  // Register
-  ExchangeRegistry.register(this)
-
-  def act = loop {
-    react {
-      case _ =>
-        Log.debug("Unhandled message.")
-    }
-  }
-  
-  def deliver(frame: Frame, channel: Channel[Spacy]) {
+object Exchange extends scaaf.exchange.Exchange[Envelope, Frame] with Logging {
+  def deliver(frame: Frame, channel: scaaf.exchange.Channel[Frame]) {
     frame match {
       case m: Message => 
         // TODO: Examine the node ID
@@ -52,8 +38,10 @@ object Exchange extends scaaf.exchange.Exchange[Frame] with Actor with Logging {
         
         // TODO: Look up the exchange ClsID from the Exchange ID, then find 
         // it in the extension point register
-        val exchange = ExchangeRegistry.getExchange(m.address.addID.cls)
-        exchange.asInstanceOf[ISCDispatcher].deliver(frame, channel)
+        println(listeners)
+        val exchange = listeners(m.address.addID.cls)
+        val chan = new Channel(channel)
+        exchange.deliver(Envelope(m.address.addID.data, m.payload), chan)
     }
   }
 }

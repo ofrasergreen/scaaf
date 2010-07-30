@@ -17,16 +17,15 @@
 package scaaf.cli
 
 import scaaf.logging.Logging
-import scaaf.exchange.ExchangeRegistry
 import scaaf.exchange.Channel
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
 import scaaf.remote.End
-import scaaf.exchange.isc.ISCDispatcher
 import scaaf.GUID
 import scaaf.Configuration
 import scaaf.cluster.LocalNode
+import scaaf.exchange.isc.Envelope
 
 import scala.collection.mutable.ListBuffer
 import scala.actors.Actor
@@ -41,35 +40,19 @@ import java.io.BufferedWriter
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange[Spacy] with ISCDispatcher with Actor with Logging {
-  // Register
-  ExchangeRegistry.register(this)
-
+object Exchange extends scaaf.exchange.Exchange[Spacy, Envelope] with Logging {
   def address = new scaaf.exchange.Address {
     override def addID = GUID.newAddID(Exchange.getClass, LocalNode.ID, 0)
   }
 
   println("exchange addr: " + address.addID)
   
-  def act = loop {
-    react {
-      case _ =>
-        Log.debug("Unhandled message.")
-    }
-  }
-  
-  def deliver(frame: Frame, channel: Channel[Spacy]) {
+  def deliver(env: Envelope, channel: Channel[Envelope]) {
     // Create a buffered 1k print writer which will return messages
-    val writer = new PrintWriter(new BufferedWriter(new RemoteWriter(channel), 1024))
-    frame match {
-      case m: Message => 
-        m.payload match {
-          case r: Request => invoke(r.args, writer)
-          case _ => Log.error("Received unwanted message of type " + m.payload.getClass)
-        }
-        
-      case _ =>
-        Log.error("Received unwanted frame of type " + frame.getClass)
+    val writer = new PrintWriter(new BufferedWriter(new RemoteWriter(channel), 1024)) 
+    env.spacy match {
+      case r: Request => invoke(r.args, writer)
+      case _ => Log.error("Received unwanted message of type " + env.spacy.getClass)
     }
   }
   

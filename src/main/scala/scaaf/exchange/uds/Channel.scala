@@ -17,15 +17,13 @@
 package scaaf.exchange.uds
 
 import scaaf.space.Spacy
-import scaaf.remote.Reply
-import scaaf.remote.End
-
+import scaaf.remote.Frame
 
 /**
  * @author ofrasergreen
  *
  */
-class Channel(connection: Connection) extends scaaf.exchange.Channel[Spacy] {
-  def reply(payload: Spacy) = connection ! Write(new Reply(payload))
-  def close() = connection ! Write(new End())
+class Channel(connection: Connection) extends scaaf.exchange.Channel[Frame] {
+  def reply(frame: Frame) = connection ! Write(frame)
+  def close() = connection ! Close
 }

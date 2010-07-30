@@ -16,14 +16,10 @@
  */
 package scaaf.exchange.isc
 
-import scaaf.remote.Frame
-import scaaf.exchange.Channel
 import scaaf.space.Spacy
 
 /**
  * @author ofrasergreen
  *
  */
-trait ISCDispatcher {
-  def deliver(frame: Frame, channel: Channel[Spacy])
-}
+case class Envelope(destination: Long, spacy: Spacy)

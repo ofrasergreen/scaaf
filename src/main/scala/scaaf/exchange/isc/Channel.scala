@@ -14,19 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.exchange.isc
 
-package scaaf.exchange
+import scaaf.remote.Frame
+import scaaf.remote.Reply
+import scaaf.remote.End
 
-import scaaf.logging.Logging
-
-import scala.collection._
-
-trait Exchange[Downstream, Upstream] extends Listener[Upstream] with Logging {
-  protected val listeners = mutable.Map[Int, Listener[Downstream]]()
-
-  def register(listener: Listener[Downstream]) {
-    listeners(listener.getClass.getCanonicalName.hashCode) = listener
+/**
+ * @author ofrasergreen
+ *
+ */
+class Channel(upstream: scaaf.exchange.Channel[Frame]) extends scaaf.exchange.Channel[Envelope] {
+  def reply(env: Envelope) = upstream.reply(new Reply(env.spacy))
+  def close() = {
+    upstream.reply(new End())
+    upstream.close
   }
 }
-
-trait Connection

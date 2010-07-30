@@ -14,25 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange
+package scaaf.exchange.service
 
-import scaaf.logging.Logging
+import scaaf.exchange.isc.Envelope
+import scaaf.space.Spacy
 
-import scala.collection._
-
-// TODO: This is a temporary class in the absence of the extension mechanism
 /**
  * @author ofrasergreen
  *
  */
-object ExchangeRegistry extends Logging {
-  val map = mutable.Map[Int, Exchange[_]]()
-
-  def getExchange(exchangeID: Int) = map(exchangeID)
-    
-  def register(exchange: Exchange[_]) {
-    val cls = exchange.getClass
-    Log.debug("Registering exchange %d:%s".format(cls.getCanonicalName.hashCode, cls.getName))
-    map(cls.getCanonicalName.hashCode) = exchange
-  }
+class Channel(upstream: scaaf.exchange.Channel[Envelope]) extends scaaf.exchange.Channel[Spacy] {
+  def reply(spacy: Spacy) = upstream.reply(new Envelope(0L, spacy))
+  def close() = upstream.close
 }

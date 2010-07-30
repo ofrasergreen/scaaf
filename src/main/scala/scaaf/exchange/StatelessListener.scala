@@ -14,19 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package scaaf.exchange
 
-import scaaf.logging.Logging
+import scaaf.kernel.StatelessService
 
-import scala.collection._
-
-trait Exchange[Downstream, Upstream] extends Listener[Upstream] with Logging {
-  protected val listeners = mutable.Map[Int, Listener[Downstream]]()
-
-  def register(listener: Listener[Downstream]) {
-    listeners(listener.getClass.getCanonicalName.hashCode) = listener
+/**
+ * @author ofrasergreen
+ *
+ */
+trait StatelessListener[T] extends Listener[T] with StatelessService {
+  protected def react: PartialFunction[Any, Unit]
+  // FIXME: Do this better e.g. with Futures
+  private var channel: Channel[T] = null
+  
+  def deliver(msg: T, channel: Channel[T]) {
+    this.channel = channel
+    react(msg)
+  }
+  
+  def reply(msg: T) = {
+    channel.reply(msg)
   }
 }
-
-trait Connection

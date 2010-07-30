@@ -17,41 +17,60 @@
 
 package scaaf.exchange.amqp
 
-import scaaf.exchange._
-import scaaf.logging._
-import scala.actors.Actor
-import Actor._
+import scaaf.exchange.Listener
+import scaaf.logging.Logging
 
-case class Bind(
-    val listener: Listener[Message], 
-    val exchangeName: String, 
-    val exchangeType: String, 
-    val queueName: String, 
-    val routingKey: String)
-case class Incoming(message: Message)
-case class DeclareQueue(name: String, durable: Boolean)
-case class DeclareExchange(name: String, exchangeType: String, durable: Boolean)
-case class BindQueue(queueName: String, exchangeName: String, routingKey: String)
+import com.rabbitmq._
+import client._
 
-class Exchange(connection: Connection) extends scaaf.exchange.Exchange[Message] with Actor with Logging {  
-  private val thesender = new Sender(connection)
-  private var receivers: List[Receiver] = List.empty
-  private val channel = connection.conn.createChannel 
+class Exchange(hostName: String, 
+    portNumber: Int, 
+    userName: String,
+    password: String,
+    virtualHost: String) extends scaaf.exchange.Exchange[Message, ListenerMessage] with Logging {
   
-  Log.debug("Creating AMQP exchange to %s:%s".format(connection.hostName, connection.portNumber))
+  // Connect to the AMQP server
+  val conn = {
+    val params = new ConnectionParameters()
+    params.setUsername(userName)
+    params.setPassword(password)
+    params.setVirtualHost(virtualHost)
+    params.setRequestedHeartbeat(0)
+    val factory = new ConnectionFactory(params)
+    factory.newConnection(hostName, portNumber)
+  }
+    
+  Log.debug("Created AMQP exchange to server %s:%s".format(hostName, portNumber))
+
+  // Create a channel and start the actor
+  private val connection = new Connection(conn.createChannel)
+  connection.start  
+    
+  def send(message: Message) {
+    Log.debug("Sending message of type '%s' to exchange '%s' with key '%s'".format(message.properties.messageType.getOrElse(""), message.envelope.exchange, message.envelope.routingKey))
+    connection ! Publish(message)
+  }
   
-  def act = loop {
-    react {
-      case b: Bind =>
-        receivers = new Receiver(connection, b, this) :: receivers
-        Log.debug("Receivers now contains: " + receivers)
-      case m: Message =>
-        thesender.send(m)
-      case DeclareQueue(name, durable) =>
-        channel.queueDeclare(name, durable) 
-      case DeclareExchange(name, exchangeType, durable) =>
-        channel.exchangeDeclare(name, exchangeType, true)
-      case BindQueue(queueName, exchangeName, routingKey) => channel.queueBind(queueName, exchangeName, routingKey) 
-    }
+  def deliver(msg: ListenerMessage, channel: scaaf.exchange.Channel[ListenerMessage]) {
+    listeners(msg.listenerID).deliver(msg.message, new Channel(this))
+  }
+  
+  def register(
+      exchangeName: String, 
+      exchangeType: String, 
+      queueName: String, 
+      routingKey: String, 
+      listener: Listener[Message]) {
+    // register the listener in the normal way
+    register(listener)
+
+    // Create a channel to consume on
+    val chan = conn.createChannel
+    chan.exchangeDeclare(exchangeName, "direct", true)
+    chan.queueDeclare(queueName, true)
+    chan.queueBind(queueName, exchangeName, routingKey)
+    
+    // Create a consumer
+    chan.basicConsume(queueName, true, new Consumer(chan, this, listener.getClass.getCanonicalName.hashCode))
   }
 }

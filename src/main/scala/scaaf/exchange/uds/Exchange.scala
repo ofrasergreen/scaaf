@@ -19,7 +19,6 @@ package scaaf.exchange.uds
 import scaaf.logging.Logging
 import scaaf.remote.Frame
 import scaaf.remote.Message
-import scaaf.exchange.ExchangeRegistry
 
 import java.net.Socket
 
@@ -34,12 +33,10 @@ case class Disconnect(connection: Connection)
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange[Frame] with Actor with Logging {
-  // Register
-  ExchangeRegistry.register(this)
-  
+object Exchange extends scaaf.exchange.Exchange[Frame, Frame] with Actor with Logging {  
   // The connections
   val connections = mutable.Set[Connection]()
+  this.start
   
   // Start up the socket server
   Server.start 
@@ -59,7 +56,7 @@ object Exchange extends scaaf.exchange.Exchange[Frame] with Actor with Logging {
     }
   }
   
-  def deliver(frame: Frame, channel: Channel) {
+  def deliver(frame: Frame, channel: scaaf.exchange.Channel[Frame]) {
     // Pass everything along to the ISC exchange
     // TODO: This should act as an extension to the ISC exchange, not invoke it directly.
     scaaf.exchange.isc.Exchange.deliver(frame, channel)

@@ -17,13 +17,12 @@
 package scaaf.exchange.service
 
 import scaaf.logging.Logging
-import scaaf.exchange.ExchangeRegistry
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
-import scaaf.exchange.isc.ISCDispatcher
-import scaaf.exchange.Channel
+import scaaf.exchange.Listener
 import scaaf.space.Spacy
+import scaaf.exchange.isc.Envelope
 
 import scala.actors.Actor
 import Actor._
@@ -32,23 +31,10 @@ import Actor._
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange[Spacy] with ISCDispatcher with Actor with Logging {
-  // Register
-  ExchangeRegistry.register(this)
-
-  def act = loop {
-    react {
-      case _ =>
-        Log.debug("Unhandled message.")
-    }
-  }
-  
-  def deliver(frame: Frame, channel: Channel[Spacy]) {
-    frame match {
-      case m: Message => 
-        Log.debug("Dispatching service " + m.msgID)
-        val listener = listeners(m.address.addID.data.toInt)
-        listener.deliver(m.payload, channel)
-    }
+object Exchange extends scaaf.exchange.Exchange[Spacy, Envelope] with Logging {
+  def deliver(env: Envelope, channel: scaaf.exchange.Channel[Envelope]) { 
+    Log.debug("Dispatching service to " + env.destination)
+    val listener = listeners(env.destination.toInt)
+    listener.deliver(env.spacy, new Channel(channel))
   }
 }

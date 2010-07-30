@@ -55,7 +55,7 @@ object Address {
     }
   }
   
-  def newFromDetails(exchange: Exchange[_], node: Node, data: Long) = {
+  def newFromDetails(exchange: Exchange[_, _], node: Node, data: Long) = {
     new Address {
       private var _addID: AddID = null
       

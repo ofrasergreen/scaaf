@@ -22,11 +22,11 @@ import scaaf.logging.Logging
  * @author ofrasergreen
  *
  */
-class Channel extends scaaf.exchange.Channel[Message] with Logging {
+class Channel(exchange: Exchange) extends scaaf.exchange.Channel[Message] with Logging {
   def reply(msg: Message) {
-    Log.error("TODO: Implement reply.")
-  }
-  def close() {
-    
+    exchange.send(msg)
+  } 
+  
+  def close() {   
   }
 }
