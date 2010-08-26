@@ -17,21 +17,19 @@
 package scaaf.isc.exchange
 
 import scaaf.logging.Logging
-import scaaf.exchange.Subscriber
+import scaaf.exchange.ReplyingSubscriber
 import scaaf.exchange.Subscribable
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
-import scaaf.exchange.ReplyableChannel
-
-
+import scaaf.exchange.Replyable
 
 /**
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange with Subscribable[Subscriber[Envelope]] with Logging {
-  def deliver(frame: Frame, channel: ReplyableChannel[Frame]) {
+object Exchange extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscriber[Envelope]] with Logging {
+  def deliver(frame: Frame, channel: Replyable[Frame]) {
     frame match {
       case m: Message => 
         // TODO: Examine the node ID

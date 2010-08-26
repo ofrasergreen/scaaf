@@ -14,13 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.exchange
+/**
+ * An entry in the Registry representing a CLI command or group
+ * 
+ * @author ofrasergreen
+ */
 
-import scaaf.logging.Logging
-import scaaf.service.Service
-
-trait Exchange extends Service with Logging {
-}
-
-trait Connection
+case class Command(
+  description: String,
+  listener: CLIListener,
+  remote: Boolean = false,
+  args: Seq[Arg]) extends Entry

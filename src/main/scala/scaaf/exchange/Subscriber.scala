@@ -17,14 +17,11 @@
 
 package scaaf.exchange
 
-import scaaf.kernel._
+import scaaf.service.Service
 
-trait Subscriber[T] extends Service {
+trait Subscriber[M, C] extends Service {
   //def deliver(channel: Channel): PartialFunction[T, Unit]
-  def deliver(msg: T, channel: Channel)
+  def deliver(msg: M, channel: C)
 }
 
-trait ReplyingSubscriber[T] extends Subscriber[T] {
-  def deliver(msg: T, channel: Channel) = deliver(msg: T, channel.asInstanceOf[ReplyableChannel[T]])
-  def deliver(msg: T, replyableChannel: ReplyableChannel[T])
-}
+trait ReplyingSubscriber[M] extends Subscriber[M, Replyable[M]]

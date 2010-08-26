@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.service
 
-package scaaf.exchange
+/**
+ * @author ofrasergreen
+ *
+ */
+trait Stateless {
 
-import scaaf.logging.Logging
-import scaaf.service.Service
-
-trait Exchange extends Service with Logging {
 }
-
-trait Connection

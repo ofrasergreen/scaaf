@@ -14,19 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.exchange
+package scaaf.service
 
 /**
  * @author ofrasergreen
  *
  */
-trait Replyable[T] {
-  def reply(msg: T)
-  def eos()
+trait StatelessService extends Service with Stateless {
+
 }
-
-
-trait Channel {  
-}
-
-trait ReplyableChannel[T] extends Channel with Replyable[T] 

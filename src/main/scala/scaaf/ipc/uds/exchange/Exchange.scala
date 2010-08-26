@@ -21,7 +21,7 @@ import scaaf.remote.Frame
 import scaaf.remote.Message
 import scaaf.exchange.Subscribable
 import scaaf.exchange.ReplyingSubscriber
-import scaaf.exchange.ReplyableChannel
+import scaaf.exchange.Replyable
 
 import java.net.Socket
 
@@ -59,7 +59,7 @@ object Exchange extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscr
     }
   }
   
-  def deliver(frame: Frame, channel: ReplyableChannel[Frame]) {
+  def deliver(frame: Frame, channel: Replyable[Frame]) {
     // Pass everything along to the ISC exchange
     // TODO: This should act as an extension to the ISC exchange, not invoke it directly.
     scaaf.isc.exchange.Exchange.deliver(frame, channel)

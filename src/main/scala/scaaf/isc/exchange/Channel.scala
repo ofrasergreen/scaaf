@@ -19,13 +19,13 @@ package scaaf.isc.exchange
 import scaaf.remote.Frame
 import scaaf.remote.Reply
 import scaaf.remote.End
-import scaaf.exchange.ReplyableChannel
+import scaaf.exchange.Replyable
 
 /**
  * @author ofrasergreen
  *
  */
-class Channel(upstream: ReplyableChannel[Frame]) extends ReplyableChannel[Envelope] {
+class Channel(upstream: Replyable[Frame]) extends Replyable[Envelope] {
   def reply(env: Envelope) = upstream.reply(new Reply(env.spacy))
   def eos() = {
     upstream.reply(new End())

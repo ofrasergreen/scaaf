@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package scaaf.exchange
 
-import scaaf.logging.Logging
-import scaaf.service.Service
-
-trait Exchange extends Service with Logging {
+/**
+ * @author ofrasergreen
+ *
+ */
+trait Replyable[T] {
+  def reply(msg: T)
+  def eos()
 }
-
-trait Connection

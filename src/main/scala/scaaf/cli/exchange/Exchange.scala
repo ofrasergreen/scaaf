@@ -17,7 +17,9 @@
 package scaaf.cli.exchange
 
 import scaaf.logging.Logging
-import scaaf.exchange.ReplyableChannel
+import scaaf.exchange.Replyable
+import scaaf.exchange.Subscribable
+import scaaf.exchange.Subscriber
 
 import scaaf.remote.Frame
 import scaaf.remote.Message
@@ -44,14 +46,15 @@ class IllegalCLIArgumentException(message: String) extends Exception(message) {}
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope] with Logging {
+object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope] with Subscribable[Subscriber[Invocation, PrintWriter]] with Logging {
   def address = new scaaf.isc.exchange.Address {
     override def addID = GUID.newAddID(Exchange.getClass, LocalNode.ID, 0)
   }
 
-  def deliver(env: Envelope, channel: ReplyableChannel[Envelope]) {
+  def deliver(env: Envelope, channel: Replyable[Envelope]) {
     // Create a buffered 1k print writer which will return messages
     val writer = new PrintWriter(new BufferedWriter(new RemoteWriter(channel), 1024)) 
+    
     env.spacy match {
       case r: Request => 
         try {
@@ -62,49 +65,45 @@ object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope
         }
       case _ => Log.error("Received unwanted message of type " + env.spacy.getClass)
     }
+    
+    writer.close
   }
   
   def invoke(args: Array[String], writer: PrintWriter) {
     Log.debug("Invoking CLI with args: " + args.toString)
     if (args.length == 0) {
-      errorExit(List("Interactive shell not implemented.", 
-        "Type '" + Configuration.name + " help' for a list of available commands."))
+      throw new IllegalCLIArgumentException("Interactive shell not implemented.\n" +
+        "Type '" + Configuration.name + " help' for a list of available commands.")
     }
     
     // Find the registry entry for the CLI
     var i = 0
-    var registry: CLIEntry = Registry
-    while (i < args.length) {
-      registry.entries.find(e => e.name == args(i)) match {
-        case Some(entry) =>
-          registry = entry
-          i += 1
+    var group: Group = RootGroup
+    var command: Option[Command] = None
+    
+    while (command.isEmpty && i < args.length) {
+      group.entries.keys.find(n => n == args(i)) match {
+        case Some(name) =>
+          group.entries(name) match {
+            case c: Command => command = Some(c)
+            case g: Group => {
+              group = g
+              i += 1
+            }
+          }
         case None => throw new IllegalCLIArgumentException("Unknown command: '" + args(i) + "'\n" + 
             "Type '" + Configuration.name + " help " + args.view(0, i).reduceLeft(_+" "+_) + "' for more help.")
       }
     }
     
-    if (registry.target.isDefined) {
-      invoke(registry, args.view(i, args.length).toList, writer)
-    } else {
-      if (i >= args.length) {
-        throw new IllegalCLIArgumentException("Not enough arguments provided.\n" + 
+    command match {
+      case Some(c) => invoke(c, args.view(0, i + 1).mkString(" "), args.view(i, args.length), writer)
+      case _ => throw new IllegalCLIArgumentException("Not enough arguments provided.\n" + 
             "Type '" + Configuration.name + " help " + args.view(0, i).reduceLeft(_+" "+_) + "' for more help.")
-      } else {
-        if (i == 0) {
-          throw new IllegalCLIArgumentException("Unknown command: '" + args(i) + "'\n" + 
-            "Type '" + Configuration.name + " help' for a list of available commands.")
-        }
-      }
     }
   }
   
-  def errorExit(msgs: List[String]) {
-    msgs.foreach(System.err.println)
-    System.exit(1)
-  }
-  
-  def mapArgs(args: List[String], argSpec: List[Arg]): Array[AnyRef] = {
+  def mapArgs(args: Seq[String], argSpec: Seq[Arg]): Array[AnyRef] = {
     var result = ListBuffer[AnyRef]()
   
     // TODO: Handle options
@@ -123,22 +122,12 @@ object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope
     result.toArray
   }
   
-  def invoke(entry: CLIEntry, args: List[String], writer: PrintWriter) {
-    val target = entry.target.get
-    val klass = Class.forName(target.cls)
-    val method = klass.getMethods().find(_.getName == target.method).getOrElse(
-        throw new Exception("Couldn't find method '" + target.method + "' on service '" + target.cls + "'")
-      )
-    
-    val typedArgs = mapArgs(args, target.argSpec)
+  def invoke(command: Command, cliCommand: String, args: Seq[String], writer: PrintWriter) {
+    val typedArgs = mapArgs(args, command.args)
       
-    if (target.local) {
-      val cliService = klass.newInstance.asInstanceOf[CLIService]
-      
-      val view = method.invoke(cliService, typedArgs:_*).asInstanceOf[CLIView]
-      view.render(writer)
-    }
-    
-    writer.close
+    //if (target.remote) {
+    command.listener.deliver(Invocation(cliCommand, typedArgs), writer)
+    //view.render(writer)
+    //}
   }
 }

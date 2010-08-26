@@ -20,9 +20,7 @@ package scaaf.cli
  * @author ofrasergreen
  *
  */
-case class InvocationTarget(
-    cls: String, 
-    method: String, 
-    local: Boolean = false,
-    argSpec: List[Arg]
+case class Invocation(
+    command: String,
+    args: Array[AnyRef]
     )

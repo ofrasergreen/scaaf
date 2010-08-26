@@ -23,7 +23,7 @@ import scala.collection._
  * @author ofrasergreen
  *
  */
-trait Subscribable[T <: Subscriber[_]] {
+trait Subscribable[T <: Subscriber[_, _]] {
   protected val subscribers = mutable.Map[Int, T]()
 
   def register(subscriber: T) {

@@ -24,14 +24,14 @@ import scaaf.exchange.ReplyingSubscriber
 import scaaf.exchange.Subscribable
 import scaaf.space.Spacy
 import scaaf.isc.exchange.Envelope
-import scaaf.exchange.ReplyableChannel
+import scaaf.exchange.Replyable
 
 /**
  * @author ofrasergreen
  *
  */
 object Exchange extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscriber[Spacy]] with ReplyingSubscriber[Envelope] with Logging {
-  def deliver(env: Envelope, channel: scaaf.exchange.ReplyableChannel[Envelope]) { 
+  def deliver(env: Envelope, channel: scaaf.exchange.Replyable[Envelope]) { 
     Log.debug("Dispatching service to " + env.destination)
     val subscriber = subscribers(env.destination.toInt)
     subscriber.deliver(env.spacy, new Channel(channel))

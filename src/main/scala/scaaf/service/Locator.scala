@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.service
 
-package scaaf.exchange
-
-import scaaf.logging.Logging
-import scaaf.service.Service
-
-trait Exchange extends Service with Logging {
+/**
+ * @author ofrasergreen
+ *
+ */
+trait Locator {
+  protected def $[T <: Service](implicit m: Manifest[T]): T = Service.lookup[T]
 }
-
-trait Connection

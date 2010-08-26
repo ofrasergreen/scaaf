@@ -14,25 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.cli.exchange
+package scaaf.service
 
-import scaaf.exchange.Replyable
-import scaaf.space.Spacy
-import scaaf.isc.exchange.Envelope
+import scala.reflect.Manifest
+
 
 /**
  * @author ofrasergreen
  *
  */
-class RemoteWriter(channel: Replyable[Envelope]) extends java.io.Writer {
-  override def close {
-    channel.eos
+trait Service {
+  // We override this so that two instances of the same service
+  // will have the same hashcode and hashcodes will be the same
+  // even if a service implementation is changed. This makes addresses
+  // constant so long as the class name remains the same.
+  override def hashCode() = this.getClass.getName.hashCode
+}
+
+/**
+ * @author ofrasergreen
+ *
+ */
+object Service {
+  private var services = Map[Class[_], Service]() 
+  
+  def lookup[T <: Service](implicit m: Manifest[T]): T = {
+    val cls = Class.forName(m.toString)
+    services(cls).asInstanceOf[T]
   }
   
-  override def flush {}
-  
-  override def write(cbuf: Array[Char], off: Int, len: Int) {
-    val output = new Output(new String(cbuf, off, len))
-    channel.reply(Envelope(0, output))
+  def add(o: Service) = {
+    services += (o.getClass -> o)
   }
 }

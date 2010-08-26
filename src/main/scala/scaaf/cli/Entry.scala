@@ -17,16 +17,9 @@
 package scaaf.cli
 
 /**
- * A registry mapping CLI commands or groups to their implementation
- * 
  * @author ofrasergreen
+ *
  */
-object Registry extends CLIEntry("", "", None) {
-  entries += new CLIEntry("help", "display help and exit", Some(
-      InvocationTarget(
-          "scaaf.cli.Help", 
-          "help", 
-          true,
-          List(new Arg("COMMAND", "COMMANDs are command and optionally sub-commands to display help about.", true, true, classOf[String]))
-      )))
+trait Entry {
+  val description: String
 }

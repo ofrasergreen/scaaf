@@ -18,6 +18,8 @@ package scaaf.kernel
 
 import scaaf.space.Space
 import scaaf.space.Reboot
+import scaaf.service.Service
+import scaaf.service.Locator
 
 /**
  * @author ofrasergreen
@@ -34,6 +36,9 @@ object Bootstrap {
     Space.start
     Space !? Reboot
     
+    // Register services
+    Service.add(new scaaf.cli.Help)
+    
     // Initialize exchanges
     scaaf.ipc.uds.exchange.Exchange
     scaaf.isc.exchange.Exchange
@@ -44,4 +49,7 @@ object Bootstrap {
     scaaf.service.exchange.Exchange.register(new scaaf.remote.EchoService())
     scaaf.isc.exchange.Exchange.register(scaaf.cli.exchange.Exchange)
     scaaf.isc.exchange.Exchange.register(scaaf.service.exchange.Exchange)
+    
+    // Initialize the CLI
+    BaseCLI
 }

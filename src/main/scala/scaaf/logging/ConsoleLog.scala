@@ -14,13 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.logging
 
-package scaaf.exchange
+import scaaf.cli.CLIView
+import java.io.PrintWriter
 
-import scaaf.logging.Logging
-import scaaf.service.Service
-
-trait Exchange extends Service with Logging {
+/**
+ * @author ofrasergreen
+ *
+ */
+class ConsoleLog extends CLIView {
+  def render(writer: PrintWriter) {
+    // TODO: Output the log
+  }
 }
-
-trait Connection

@@ -14,17 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.kernel
-
-trait Stateless {
-  
-}
-
-trait Service {
-  
-}
-
-trait StatelessService extends Service with Stateless {
-
+/**
+ * @author ofrasergreen
+ *
+ */
+case class Group(description: String) extends Entry {
+  var entries = Map[String, Entry]()
+  def += (kv: (String, Entry)) = entries += kv
 }

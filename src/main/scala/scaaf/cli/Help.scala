@@ -27,10 +27,10 @@ import java.io.PrintWriter
  *
  */
 class Help extends CLIService {
-  def help(cats: List[String]): CLIView = {
-    val categories = TableOutput(Registry.entries.map(e => TableRowOutput(ListMap(
-      "category" -> e.name,
-      "description" -> e.description
+  def help(cats: Seq[String]): CLIView = {
+    val groups = TableOutput(RootGroup.entries.keys.map(k => TableRowOutput(ListMap(
+      "category" -> k,
+      "description" -> RootGroup.entries(k).description
     ))).toList)
     
     new CLIView() {
@@ -39,7 +39,7 @@ class Help extends CLIService {
         w.println("Type '" + Configuration.name + " help <command>' for help on a specific command.")
         w.println()
         w.println("Available commands:")
-        categories.format.drop(1).foreach(c => w.println("   " + c ))
+        groups.format.drop(1).foreach(c => w.println("   " + c ))
       }
     }
   }

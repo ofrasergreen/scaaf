@@ -19,14 +19,14 @@ package scaaf.remote
 import scaaf.exchange.ReplyingSubscriber
 import scaaf.logging.Logging
 import scaaf.space.Spacy
-import scaaf.exchange.ReplyableChannel
+import scaaf.exchange.Replyable
 
 /**
  * @author ofrasergreen
  *
  */
 class EchoService extends ReplyingSubscriber[Spacy] with Logging {
-  def deliver(msg: Spacy, channel: ReplyableChannel[Spacy]) {
+  def deliver(msg: Spacy, channel: Replyable[Spacy]) {
     msg match {
       case e: EchoRequest =>
         Log.debug("Received echo request.")

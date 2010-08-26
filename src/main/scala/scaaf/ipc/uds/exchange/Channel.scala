@@ -18,13 +18,13 @@ package scaaf.ipc.uds.exchange
 
 import scaaf.space.Spacy
 import scaaf.remote.Frame
-import scaaf.exchange.ReplyableChannel
+import scaaf.exchange.Replyable
 
 /**
  * @author ofrasergreen
  *
  */
-class Channel(connection: Connection) extends ReplyableChannel[Frame] {
+class Channel(connection: Connection) extends Replyable[Frame] {
   def reply(frame: Frame) = connection ! Write(frame)
   def eos() = connection ! Close
 }

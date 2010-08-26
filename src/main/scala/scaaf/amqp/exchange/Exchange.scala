@@ -28,7 +28,7 @@ class Exchange(hostName: String,
     portNumber: Int, 
     userName: String,
     password: String,
-    virtualHost: String) extends scaaf.exchange.Exchange with Subscribable[Subscriber[MessageBody]] with scaaf.exchange.Publisher[Address, MessageBody] with Logging {
+    virtualHost: String) extends scaaf.exchange.Exchange with Subscribable[Subscriber[MessageBody, Channel]] with scaaf.exchange.Publisher[Address, MessageBody] with Logging {
   
   // Connect to the AMQP server
   val conn = {
@@ -41,8 +41,6 @@ class Exchange(hostName: String,
     factory.newConnection(hostName, portNumber)
   }
     
-  Log.debug("Created AMQP exchange to server %s:%s".format(hostName, portNumber))
-
   // Create a channel and start the actor
   private val connection = new Connection(conn.createChannel)
   connection.start  
@@ -61,7 +59,7 @@ class Exchange(hostName: String,
       exchangeType: String, 
       queueName: String, 
       routingKey: String, 
-      subscriber: Subscriber[MessageBody]) {
+      subscriber: Subscriber[MessageBody, Channel]) {
     // register the subscriber in the normal way
     register(subscriber)
 

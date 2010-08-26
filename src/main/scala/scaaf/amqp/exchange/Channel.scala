@@ -22,5 +22,5 @@ import scaaf.logging.Logging
  * @author ofrasergreen
  *
  */
-class Channel(val sendersAddress: Address) extends scaaf.exchange.Channel with Logging {
+class Channel(val sendersAddress: Address) extends Logging {
 }

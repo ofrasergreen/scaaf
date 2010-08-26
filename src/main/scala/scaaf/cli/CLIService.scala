@@ -16,7 +16,7 @@
  */
 package scaaf.cli
 
-import scaaf.kernel.StatelessService
+import scaaf.service.StatelessService
 
 /**
  * @author ofrasergreen

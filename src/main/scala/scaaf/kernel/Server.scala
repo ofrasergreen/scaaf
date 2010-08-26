@@ -20,15 +20,17 @@ import scaaf.cli.CLIService
 import scaaf.logging.Logging
 import scaaf.remote.SelectingRunner
 import scaaf.ApplicationRef
+import scaaf.logging.ConsoleLog
 
 /**
  * @author ofrasergreen
  *
  */
 class Server extends CLIService with Logging {
-  def start() {
+  def start() = {
     //SelectingRunner.start
     Log.info("Server started")
     ApplicationRef.application.init
+    new ConsoleLog
   }
 }

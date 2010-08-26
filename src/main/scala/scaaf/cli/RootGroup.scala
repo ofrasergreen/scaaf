@@ -14,20 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.cli
 
-package scaaf.kernel
+import scaaf.service.Service
 
-import scala.collection.mutable.Map
+import java.io.PrintWriter
 
-
-object Context {  
-  private val services = Map[Class[_], StatelessService]() 
-  
-  def lookup[T <: StatelessService](m:Class[T]): T = {
-    services(m).asInstanceOf[T]
-  }
-  
-  def add(o: StatelessService) = {
-    services += (o.getClass -> o)
-  }
+/**
+ * A registry mapping CLI commands or groups to their implementation
+ * 
+ * @author ofrasergreen
+ */
+object RootGroup extends Group("") {
 }
