@@ -28,12 +28,10 @@ import java.io.PrintWriter
  */
 class Help extends CLIService {
   def help(cats: List[String]): CLIView = {
-    val categories = TableOutput(Registry.entries.keySet.map(k => TableRowOutput(ListMap(
-      "category" -> k,
-      "description" -> Registry.entries(k).description
+    val categories = TableOutput(Registry.entries.map(e => TableRowOutput(ListMap(
+      "category" -> e.name,
+      "description" -> e.description
     ))).toList)
-    
-    
     
     new CLIView() {
       def render(w: PrintWriter) = {

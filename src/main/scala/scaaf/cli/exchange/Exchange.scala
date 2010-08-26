@@ -33,15 +33,18 @@ import scala.actors.Actor
 import Actor._
 
 import scaaf.space.Spacy
+import scaaf.exchange.ReplyingSubscriber
 
 import java.io.PrintWriter
 import java.io.BufferedWriter
+
+class IllegalCLIArgumentException(message: String) extends Exception(message) {}
 
 /**
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange with scaaf.exchange.ReplyingSubscriber[Envelope] with Logging {
+object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope] with Logging {
   def address = new scaaf.isc.exchange.Address {
     override def addID = GUID.newAddID(Exchange.getClass, LocalNode.ID, 0)
   }
@@ -50,7 +53,13 @@ object Exchange extends scaaf.exchange.Exchange with scaaf.exchange.ReplyingSubs
     // Create a buffered 1k print writer which will return messages
     val writer = new PrintWriter(new BufferedWriter(new RemoteWriter(channel), 1024)) 
     env.spacy match {
-      case r: Request => invoke(r.args, writer)
+      case r: Request => 
+        try {
+          invoke(r.args, writer)
+        } catch {
+          case e: IllegalCLIArgumentException => 
+            writer.print(e.getMessage)
+        }
       case _ => Log.error("Received unwanted message of type " + env.spacy.getClass)
     }
   }
@@ -64,26 +73,27 @@ object Exchange extends scaaf.exchange.Exchange with scaaf.exchange.ReplyingSubs
     
     // Find the registry entry for the CLI
     var i = 0
-    var registry: RegistryEntry = Registry
-    while (i < args.length && registry.entries.contains(args(i))) {
-      registry = registry.entries(args(i))
-      i += 1
+    var registry: CLIEntry = Registry
+    while (i < args.length) {
+      registry.entries.find(e => e.name == args(i)) match {
+        case Some(entry) =>
+          registry = entry
+          i += 1
+        case None => throw new IllegalCLIArgumentException("Unknown command: '" + args(i) + "'\n" + 
+            "Type '" + Configuration.name + " help " + args.view(0, i).reduceLeft(_+" "+_) + "' for more help.")
+      }
     }
     
     if (registry.target.isDefined) {
       invoke(registry, args.view(i, args.length).toList, writer)
     } else {
       if (i >= args.length) {
-        errorExit(List("Not enough arguments provided.", 
-          "Type '" + Configuration.name + " help " + args.reduceLeft(_+" "+_) + "' for more help."))
+        throw new IllegalCLIArgumentException("Not enough arguments provided.\n" + 
+            "Type '" + Configuration.name + " help " + args.view(0, i).reduceLeft(_+" "+_) + "' for more help.")
       } else {
         if (i == 0) {
-          errorExit(List("Unknown command: '" + args(i) + "'", 
-            "Type '" + Configuration.name + " help' for a list of available commands."))
-        } else {
-          errorExit(List("Unknown command: '" + args(i) + "'", 
-            "Type '" + Configuration.name + " help " + args.view(0, i).reduceLeft(_+" "+_) + "' for more help."))
-          
+          throw new IllegalCLIArgumentException("Unknown command: '" + args(i) + "'\n" + 
+            "Type '" + Configuration.name + " help' for a list of available commands.")
         }
       }
     }
@@ -113,7 +123,7 @@ object Exchange extends scaaf.exchange.Exchange with scaaf.exchange.ReplyingSubs
     result.toArray
   }
   
-  def invoke(entry: RegistryEntry, args: List[String], writer: PrintWriter) {
+  def invoke(entry: CLIEntry, args: List[String], writer: PrintWriter) {
     val target = entry.target.get
     val klass = Class.forName(target.cls)
     val method = klass.getMethods().find(_.getName == target.method).getOrElse(

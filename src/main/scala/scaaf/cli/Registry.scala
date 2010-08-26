@@ -21,8 +21,8 @@ package scaaf.cli
  * 
  * @author ofrasergreen
  */
-object Registry extends RegistryEntry("", None) {
-  entries("help") = new RegistryEntry("display help and exit", Some(
+object Registry extends CLIEntry("", "", None) {
+  entries += new CLIEntry("help", "display help and exit", Some(
       InvocationTarget(
           "scaaf.cli.Help", 
           "help", 

@@ -18,7 +18,7 @@ package scaaf
 
 import scaaf.logging._
 import scaaf.cli.Registry
-import scaaf.cli.RegistryEntry
+import scaaf.cli.CLIEntry
 import scaaf.cli.InvocationTarget
 import java.io.PrintWriter
 
@@ -39,14 +39,13 @@ trait Application extends Logging {
     scaaf.kernel.Bootstrap
     
     // Add the server CLI (TODO: Find a better place for this)
-    val serverCLI = new RegistryEntry("view or change the state of the server", None)
-    serverCLI.entries("start") = new RegistryEntry("start the server", Some(
+    val serverCLI = new CLIEntry("server", "view or change the state of the server", None)
+    serverCLI.entries += new CLIEntry("start", "start the server", Some(
         InvocationTarget(
             "scaaf.kernel.Server", 
             "start", 
             true,
             List())))
-    Registry.entries("server") = serverCLI
         
     scaaf.cli.exchange.Exchange.invoke(args, new PrintWriter(System.out))
     //start
