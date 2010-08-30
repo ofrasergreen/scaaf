@@ -39,8 +39,7 @@ case class Write(frame: Frame)
 class Connection(socket: Socket) extends Actor with Logging {
   val is = socket.getInputStream
   val os = socket.getOutputStream
-     
-        
+  
   def act = loop {
     react {
       case Read =>

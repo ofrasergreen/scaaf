@@ -40,9 +40,10 @@ import JavaIO._
  */
 object Server extends Thread with Configuration with Logging {
   val server = AFUNIXServerSocket.newInstance
-  server.bind(new AFUNIXSocketAddress(socketFile))
   
   override def run() = {
+    server.bind(new AFUNIXSocketAddress(socketFile))
+    
     while(true) {
       Log.debug("Waiting for socket connection...")
       

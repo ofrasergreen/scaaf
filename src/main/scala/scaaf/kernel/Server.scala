@@ -28,9 +28,12 @@ import scaaf.logging.ConsoleLog
  */
 class Server extends CLIService with Logging {
   def start() = {
-    //SelectingRunner.start
+    // Start the socket server
+    scaaf.ipc.uds.exchange.Exchange.init
+    
     Log.info("Server started")
     ApplicationRef.application.init
+    
     new ConsoleLog
   }
 }

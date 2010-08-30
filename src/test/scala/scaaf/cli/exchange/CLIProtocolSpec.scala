@@ -40,6 +40,7 @@ class CLIProtocolSpec extends WordSpec with MustMatchers with BeforeAndAfterEach
   override def beforeEach = {
     reset
     client = new IPCClient
+    client.connect
   }
   
   override def afterEach {

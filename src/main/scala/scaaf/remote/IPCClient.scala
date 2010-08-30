@@ -26,6 +26,8 @@ import sbinary._
 import DefaultProtocol._
 import Operations._
 import JavaIO._
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * @author ofrasergreen
@@ -33,14 +35,23 @@ import JavaIO._
  */
 class IPCClient extends scaaf.ipc.uds.exchange.Configuration {
   val sock = AFUNIXSocket.newInstance
-  sock.connect(new AFUNIXSocketAddress(socketFile))
-      
-  val is = sock.getInputStream
-  val os = sock.getOutputStream
+  
+  private var is: InputStream = _
+  private var os: OutputStream = _
   
   def send(frame: Frame) = RemoteProtocol.RemoteMessageFormat.writes(os, frame)
   def receive() = RemoteProtocol.RemoteMessageFormat.reads(is)
-      
+  
+  def serverExists = socketFile.exists
+  
+  def connect {
+    sock.connect(new AFUNIXSocketAddress(socketFile))
+    
+    // Connect the streams
+    is = sock.getInputStream
+    os = sock.getOutputStream
+  }
+  
   def disconnect {
     is.close
     os.close

@@ -39,10 +39,13 @@ case class Disconnect(connection: Connection)
 object Exchange extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscriber[Frame]] with Actor with Logging {  
   // The connections
   val connections = mutable.Set[Connection]()
-  this.start
   
-  // Start up the socket server
-  Server.start 
+  def init {
+    // Start the actor
+    start
+    // Start up the socket server
+    Server.start
+  }
   
   def act = loop {
     react {

@@ -35,9 +35,9 @@ trait Application extends Logging {
     Log.debug("Bootstrapping...")
     scaaf.kernel.Bootstrap
     
-    val writer = new PrintWriter(System.out)
-    scaaf.cli.exchange.Exchange.invoke(args, writer)
-    writer.close
+    // Invoke
+    scaaf.cli.Invoker.invoke(args)
+    
     System.exit(0)
   }
   
