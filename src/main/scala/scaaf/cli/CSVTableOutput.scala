@@ -16,10 +16,21 @@
  */
 package scaaf.cli
 
-import scaaf.space.Spacy
+import scaaf.space._
+import scala.collection.mutable.ListBuffer
+import java.io.PrintWriter
 
 /**
  * @author ofrasergreen
  *
  */
-case class TableRowOutput(columns: Map[String, Any])
+class CSVTableOutput(rows: List[MapOutput]) extends CLIView {
+  def render(w: PrintWriter) {
+    if (!rows.isEmpty) {
+      // Print the header
+      val first = rows.head
+      w.println(first.keys.mkString(","))
+      rows.foreach(y => w.println(y.values.mkString(",")))
+    }
+  }
+}

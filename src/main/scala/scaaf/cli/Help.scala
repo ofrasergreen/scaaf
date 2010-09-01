@@ -28,10 +28,10 @@ import java.io.PrintWriter
  */
 class Help extends CLIService {
   def help(cats: Seq[String]): CLIView = {
-    val groups = TableOutput(RootGroup.entries.keys.map(k => TableRowOutput(ListMap(
+    val groups = new TableOutput(RootGroup.entries.keys.map(k => MapOutput(
       "category" -> k,
       "description" -> RootGroup.entries(k).description
-    ))).toList)
+    )).toList)
     
     new CLIView() {
       def render(w: PrintWriter) = {

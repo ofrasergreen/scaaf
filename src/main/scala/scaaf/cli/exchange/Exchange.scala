@@ -97,7 +97,7 @@ object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope
     }
     
     command match {
-      case Some(c) => invoke(c, args.view(0, i + 1).mkString(" "), args.view(i, args.length), writer)
+      case Some(c) => invoke(c, args.view(0, i + 1).mkString(" "), args.view(i + 1, args.length), writer)
       case _ => throw new IllegalCLIArgumentException("Not enough arguments provided.\n" + 
             "Type '" + Configuration.name + " help " + args.view(0, i).reduceLeft(_+" "+_) + "' for more help.")
     }
@@ -112,6 +112,8 @@ object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope
     argSpec.foreach(spec => {
       if (spec.repeated) {
         result += args.slice(i, args.length)
+      } else {
+        result += args(i)
       }
       
       i += 1

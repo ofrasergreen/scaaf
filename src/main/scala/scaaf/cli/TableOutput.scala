@@ -24,7 +24,7 @@ import java.io.PrintWriter
  * @author ofrasergreen
  *
  */
-case class TableOutput(rows: List[TableRowOutput]) extends CLIView {
+class TableOutput(rows: List[MapOutput]) extends CLIView {
   def render(w: PrintWriter) {
     format.foreach(row => w.println(row))
   }
@@ -36,7 +36,7 @@ case class TableOutput(rows: List[TableRowOutput]) extends CLIView {
     }
     
     val first = rows.head
-    val table = first.columns.keys.toList :: rows.map(o => o.columns.values.map(_.toString).toList)    
+    val table = first.keys.toList :: rows.map(o => o.values.map(_.toString).toList)    
     
     // Initiate the lengths list to 0
     val lengths = Array.fill(table(0).size)(0)
