@@ -36,9 +36,8 @@ trait Application extends Logging {
     scaaf.kernel.Bootstrap
     
     // Invoke
-    scaaf.cli.Invoker.invoke(args)
-    
-    System.exit(0)
+    val exitCode = scaaf.cli.Invoker.invoke(args)
+    System.exit(exitCode)
   }
   
   /**

@@ -50,7 +50,7 @@ class PosixSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with 
   "The IPC POSIX controller" should {
     val f = new File("test" + File.separator + "ipc.sock")
     
-    "create a Unix Domain Socket called 'cli.sock'" in {
+    "create a Unix Domain Socket called 'ipc.sock'" in {
       assert(f.exists === true)
     }
     

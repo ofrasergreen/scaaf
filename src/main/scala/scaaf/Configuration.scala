@@ -24,4 +24,5 @@ object Configuration {
   var name: String = "UNDEFINED"
   var varDir: String = "var"
   var libDir: String = "lib"
+  var logLevel: Int = 5
 }

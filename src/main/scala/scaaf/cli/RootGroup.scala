@@ -25,5 +25,20 @@ import java.io.PrintWriter
  * 
  * @author ofrasergreen
  */
-object RootGroup extends Group("") {
+class RootGroup extends Group("", "") with CLIListener {
+  entries += scaaf.kernel.$NodeCLIGroup()
+  entries += $HelpGroup()
+  
+  def deliver(args: Seq[String], io: IO) {
+    val tail = args.tail
+    args.head match {
+      case "node" => scaaf.kernel.$NodeCLIGroup().deliver(tail, io)
+      case "help" => $HelpGroup().deliver(tail, io)
+    }
+  }
+}
+
+object $RootGroup {
+  var o = new RootGroup
+  def apply() = o
 }

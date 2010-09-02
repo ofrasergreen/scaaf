@@ -14,12 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package scaaf.cli
 
-import scala.collection.Map
+import java.io.BufferedReader
 import java.io.PrintWriter
-
-trait CLIView {
-  def render(io: IO)
+/**
+ * @author ofrasergreen
+ *
+ */
+class IO(val in: BufferedReader, val out: PrintWriter, val err: PrintWriter) {
+  def close {
+    in.close
+    out.close
+    err.close
+  }
+  
+  def flush {
+    out.flush
+    err.flush
+  }
 }

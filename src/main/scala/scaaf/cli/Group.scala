@@ -20,7 +20,6 @@ package scaaf.cli
  * @author ofrasergreen
  *
  */
-case class Group(description: String) extends Entry {
-  var entries = Map[String, Entry]()
-  def += (kv: (String, Entry)) = entries += kv
+case class Group(name: String, description: String) extends Entry {
+  val entries = scala.collection.mutable.ListBuffer[Entry]()
 }

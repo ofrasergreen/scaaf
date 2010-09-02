@@ -51,5 +51,5 @@ object Bootstrap {
     scaaf.isc.exchange.Exchange.register(scaaf.service.exchange.Exchange)
     
     // Initialize the CLI
-    BaseCLI
+    
 }

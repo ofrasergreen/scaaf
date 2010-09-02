@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package scaaf.cli
 
-import scala.collection.Map
-import java.io.PrintWriter
-
-trait CLIView {
-  def render(io: IO)
+/**
+ * @author ofrasergreen
+ *
+ */
+case class TargetedCommands(name: String, description: String) extends Entry {
+  val entries = scala.collection.mutable.ListBuffer[Entry]()
 }

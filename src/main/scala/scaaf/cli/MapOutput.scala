@@ -29,7 +29,7 @@ import scala.collection.mutable.MapLike
 case class MapOutput() extends ListMap[String, Any] with MapLike[String, Any, MapOutput] with CLIView {
   override def empty = MapOutput.empty
   
-  def render(w: PrintWriter) {
+  def render(io: IO) {
     // Find the longest key
     var maxLength = 0
     keys.foreach(k => if (k.length > maxLength) maxLength = k.length)
@@ -38,23 +38,23 @@ case class MapOutput() extends ListMap[String, Any] with MapLike[String, Any, Ma
       val v = this(k)
       v match {
         case l: MapOutput =>
-          w.println("%s %s:".format(" " * (maxLength - k.length), k))
-          l.writeIndented(maxLength, w)
-        case _ => w.println("%s %s: %s".format(" " * (maxLength - k.length), k, this(k)))
+          io.out.println("%s %s:".format(" " * (maxLength - k.length), k))
+          l.writeIndented(maxLength, io)
+        case _ => io.out.println("%s %s: %s".format(" " * (maxLength - k.length), k, this(k)))
       }
     })
   }
   
-  def writeIndented(indentation: Int, w: PrintWriter) {
+  def writeIndented(indentation: Int, io: IO) {
     // TODO: Rationalize this with render
     val margin = " " * (indentation + 2)
     keys.foreach(k => {
       val v = this(k)
       v match {
         case l: MapOutput =>
-          w.println("%s %s:".format(margin, k))
-          l.writeIndented(margin.length + 3, w)
-        case _ => w.println("%s %s: %s".format(margin, k, this(k)))
+          io.out.println("%s %s:".format(margin, k))
+          l.writeIndented(margin.length + 3, io)
+        case _ => io.out.println("%s %s: %s".format(margin, k, this(k)))
       }
     })
   }

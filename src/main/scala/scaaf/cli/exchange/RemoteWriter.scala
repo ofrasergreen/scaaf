@@ -24,7 +24,7 @@ import scaaf.isc.exchange.Envelope
  * @author ofrasergreen
  *
  */
-class RemoteWriter(channel: Replyable[Envelope]) extends java.io.Writer {
+class RemoteWriter(channel: Replyable[Envelope], error: Boolean) extends java.io.Writer {
   override def close {
     channel.eos
   }
@@ -32,7 +32,8 @@ class RemoteWriter(channel: Replyable[Envelope]) extends java.io.Writer {
   override def flush {}
   
   override def write(cbuf: Array[Char], off: Int, len: Int) {
-    val output = new Output(new String(cbuf, off, len))
-    channel.reply(Envelope(0, output))
+    val str = new String(cbuf, off, len)
+    val msg = if (error) new Error(str) else new Output(str)
+    channel.reply(Envelope(0, msg))
   }
 }

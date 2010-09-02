@@ -17,6 +17,8 @@
 package scaaf.cli
 
 import java.io.PrintWriter
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import exchange.Exchange
 import scaaf.remote.IPCClient
 import exchange.Request
@@ -31,7 +33,9 @@ import scaaf.remote.End
  *
  */
 object Invoker {
-  def invoke(args: Array[String]) {
+  def invoke(args: Array[String]): Int = {
+    var exitCode = 0
+    
     // Test if the server is running
     val ipcClient = new IPCClient
     
@@ -64,9 +68,19 @@ object Invoker {
       ipcClient.disconnect
     } else {
       // Run the commands locally
-      val writer = new PrintWriter(System.out)
-      Exchange.invoke(args, writer)
-      writer.close
+      val io = new IO(new BufferedReader(new InputStreamReader(System.in)),
+          new PrintWriter(System.out), new PrintWriter(System.err)) 
+      try {
+        Exchange.invoke(args, io)
+      } catch {
+        case e: Throwable =>
+          System.err.println(e.getMessage)
+          if (scaaf.Configuration.logLevel > 3) e.printStackTrace()
+          exitCode = 1
+      }
+      io.flush
     }
+    
+    return exitCode
   }
 }

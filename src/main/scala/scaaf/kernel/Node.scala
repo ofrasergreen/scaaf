@@ -14,12 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package scaaf.kernel
 
-package scaaf.cli
+import scaaf.cli.CLIService
+import scaaf.logging.Logging
+import scaaf.remote.SelectingRunner
+import scaaf.ApplicationRef
+import scaaf.logging.ConsoleLog
 
-import scala.collection.Map
-import java.io.PrintWriter
+/**
+ * @author ofrasergreen
+ *
+ */
+class Node extends CLIService with Logging {
+  def start() = {
+    // Start the socket server
+    scaaf.ipc.uds.exchange.Exchange.init
+    
+    Log.info("Server started")
+    ApplicationRef.application.init
+    
+    new ConsoleLog
+  }
+}
 
-trait CLIView {
-  def render(io: IO)
+object $Node {
+  var imp = new Node
+  def apply() = imp
 }

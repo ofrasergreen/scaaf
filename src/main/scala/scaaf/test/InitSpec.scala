@@ -20,7 +20,7 @@ package scaaf.test
 import scaaf._
 import space.Space
 import space.Reboot
-import kernel.Server
+import kernel.Node
 import java.io.File
 import scaaf.logging._
 
@@ -31,7 +31,7 @@ object OnetimeBootstrap extends Logging {
 trait InitSpec extends Application {
   Configuration.varDir = "test"
   OnetimeBootstrap
-  val server = new Server()
+  val node = new Node()
   bootstrap
   
   def bootstrap {

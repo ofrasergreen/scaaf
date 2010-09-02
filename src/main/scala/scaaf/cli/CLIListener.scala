@@ -23,4 +23,4 @@ import java.io.PrintWriter
  * @author ofrasergreen
  *
  */
-trait CLIListener extends Subscriber[Invocation, PrintWriter]
+trait CLIListener extends Subscriber[Seq[String], IO]

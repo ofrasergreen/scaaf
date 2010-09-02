@@ -25,8 +25,8 @@ import java.io.PrintWriter
  *
  */
 class TableOutput(rows: List[MapOutput]) extends CLIView {
-  def render(w: PrintWriter) {
-    format.foreach(row => w.println(row))
+  def render(io: IO) {
+    format.foreach(row => io.out.println(row))
   }
   
   def format(): List[String] = {

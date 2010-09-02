@@ -14,13 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.cli
+package scaaf.kernel
+
+import scaaf.cli.Group
+import scaaf.cli.CLIListener
+import scaaf.cli.IO
 
 /**
  * @author ofrasergreen
  *
  */
-case class Invocation(
-    command: String,
-    args: Array[AnyRef]
-    )
+class NodeCLIGroup extends Group("node", "View or change the state of nodes.") with CLIListener {
+  def deliver(args: Seq[String], io: IO) {
+    args.head match {
+      case "start" => $Node().start
+    }
+  }
+}
+
+object $NodeCLIGroup {
+  var imp = new NodeCLIGroup
+  def apply() = imp
+}

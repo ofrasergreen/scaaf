@@ -21,5 +21,6 @@ package scaaf.cli
  *
  */
 trait Entry {
+  val name: String
   val description: String
 }

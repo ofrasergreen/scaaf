@@ -25,5 +25,6 @@ import scaaf.space.Spacy
 trait RemoteMessages extends Spacy
 
 case class Output(str: String) extends RemoteMessages
+case class Error(str: String) extends RemoteMessages
 
 case class Request(args: Array[String]) extends RemoteMessages

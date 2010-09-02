@@ -25,12 +25,12 @@ import java.io.PrintWriter
  *
  */
 class CSVTableOutput(rows: List[MapOutput]) extends CLIView {
-  def render(w: PrintWriter) {
+  def render(io: IO) {
     if (!rows.isEmpty) {
       // Print the header
       val first = rows.head
-      w.println(first.keys.mkString(","))
-      rows.foreach(y => w.println(y.values.mkString(",")))
+      io.out.println(first.keys.mkString(","))
+      rows.foreach(y => io.out.println(y.values.mkString(",")))
     }
   }
 }

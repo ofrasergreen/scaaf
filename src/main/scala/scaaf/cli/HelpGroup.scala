@@ -14,26 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.kernel
+package scaaf.cli
 
-import scaaf.cli.CLIService
-import scaaf.logging.Logging
-import scaaf.remote.SelectingRunner
-import scaaf.ApplicationRef
-import scaaf.logging.ConsoleLog
+import scaaf.service.Locator
+import java.io.PrintWriter
 
 /**
  * @author ofrasergreen
  *
  */
-class Server extends CLIService with Logging {
-  def start() = {
-    // Start the socket server
-    scaaf.ipc.uds.exchange.Exchange.init
-    
-    Log.info("Server started")
-    ApplicationRef.application.init
-    
-    new ConsoleLog
+class HelpGroup extends Group("help", "Display help and exit.") with CLIListener {
+  def deliver(args: Seq[String], io: IO) {
+    $Help().help(args) render io
   }
+}
+
+object $HelpGroup {
+  var imp = new HelpGroup()
+  def apply() = imp
 }

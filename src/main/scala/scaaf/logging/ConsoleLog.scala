@@ -17,14 +17,14 @@
 package scaaf.logging
 
 import scaaf.cli.CLIView
-import java.io.PrintWriter
+import scaaf.cli.IO
 
 /**
  * @author ofrasergreen
  *
  */
 class ConsoleLog extends CLIView {
-  def render(writer: PrintWriter) {
+  def render(io: IO) {
     // TODO: Output the log
   }
 }

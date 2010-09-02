@@ -23,7 +23,7 @@ package scaaf.cli
  */
 
 case class Command(
+  name: String,
   description: String,
-  listener: CLIListener,
   remote: Boolean = false,
-  args: Seq[Arg]) extends Entry
+  args: Seq[Arg] = Seq[Arg]()) extends Entry
