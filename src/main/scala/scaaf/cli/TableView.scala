@@ -17,44 +17,57 @@
 package scaaf.cli
 
 import scaaf.space._
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 import java.io.PrintWriter
 
 /**
  * @author ofrasergreen
  *
  */
-class TableOutput(rows: List[MapOutput]) extends CLIView {
+trait TableView extends CLIView {
+  this: Seq[Map[String, Any]] =>
+  
   def render(io: IO) {
     format.foreach(row => io.out.println(row))
   }
   
-  def format(): List[String] = {
+  def format(): Seq[String] = {
     // Convert to a List[List[String]]
-    if (rows.isEmpty) {
+    if (this.isEmpty) {
       return List()
     }
     
-    val first = rows.head
-    val table = first.keys.toList :: rows.map(o => o.values.map(_.toString).toList)    
+    val first = this.head
+    val table = first.keys.toList :: this.map(o => o.values.map(_.toString)).toList
     
     // Initiate the lengths list to 0
     val lengths = Array.fill(table(0).size)(0)
     
     // Look for the longest item in each column
-    table.foreach(y => 
-      for (i <- 0 to y.size - 1)(lengths(i) = lengths(i).max(y(i).toString.length))
-    )
+    table.foreach(y => {
+      var i = 0
+      y.foreach(col => {
+        lengths(i) = lengths(i).max(col.toString.length)
+        i += 1
+      })
+    })
     
-    val output = ListBuffer[String]()
+    val output = ArrayBuffer[String]()
     table.foreach(y => {
       var row = ""
-      for (i <- 0 to y.size - 1)({
-        row += y(i).toString + " " * (lengths(i) - y(i).toString.length + 1)
+      var i = 0
+      y.foreach(col => {
+        row += col.toString + " " * (lengths(i) - col.toString.length + 1)
+        i += 1
       })
       output += row
     })
     
-    output.toList
+    output.toSeq
   }
+}
+
+object TableView {
+  def apply(xs: Seq[Map[String, Any]]) = empty ++= xs
+  def empty = new ArrayBuffer[Map[String, Any]] with TableView
 }

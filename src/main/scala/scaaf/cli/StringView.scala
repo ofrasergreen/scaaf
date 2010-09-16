@@ -14,37 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf
-package cli
-
-import scaaf.service.Service
-
-import java.io.PrintWriter
+package scaaf.cli
 
 /**
- * A registry mapping CLI commands or groups to their implementation
- * 
  * @author ofrasergreen
+ *
  */
-class RootGroup extends Group("", "") {
-  entries += scaaf.kernel.$NodeCLIGroup()
-  entries += $HelpGroup()
-  
-//  deliver += ({
-//    case "node" :: args => kernel.$NodeCLIGroup()(args)
-//    case "help" :: args => $HelpGroup()(args)
-//  })
-  
-  def deliver(args: Seq[String], io: IO) {
-    val tail = args.tail
-    args.head match {
-      case "node" => kernel.$NodeCLIGroup().deliver(tail, io)
-      case "help" => $HelpGroup().deliver(tail, io)
-    }
+class StringView(val str: String) extends CLIView {  
+  def render(io: IO) {
+    io.out.println(str)
   }
 }
 
-object $RootGroup {
-  var o = new RootGroup
-  def apply() = o
+object StringView {
+  def apply(s: String) = new StringView(s)
 }

@@ -61,7 +61,6 @@ object Address {
       
       override def addID = {
         if (_addID == null) _addID = GUID.newAddID(exchange.getClass, node.ID, 0)
-        println(_addID)
         _addID
       }
       

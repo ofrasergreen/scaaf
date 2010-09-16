@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.cli.exchange
+package scaaf
+package cli.exchange
 
 import scaaf.logging.Logging
 import scaaf.exchange.Replyable
@@ -29,6 +30,7 @@ import scaaf.Configuration
 import scaaf.cluster.LocalNode
 import scaaf.isc.exchange.Envelope
 import scaaf.cli._
+import service.Service
 
 import scala.collection.mutable.ListBuffer
 import scala.actors.Actor
@@ -39,6 +41,8 @@ import scaaf.exchange.ReplyingSubscriber
 
 import java.io.PrintWriter
 import java.io.BufferedWriter
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 class IllegalCLIArgumentException(message: String) extends Exception(message) {}
 
@@ -46,7 +50,7 @@ class IllegalCLIArgumentException(message: String) extends Exception(message) {}
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope] with Subscribable[Subscriber[Seq[String], IO]] with Logging {
+object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope] with Service with Logging {
   def address = new scaaf.isc.exchange.Address {
     override def addID = GUID.newAddID(Exchange.getClass, LocalNode.ID, 0)
   }
@@ -54,9 +58,10 @@ object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope
   def deliver(env: Envelope, channel: Replyable[Envelope]) {
     // Create buffered 1k print writers which will return messages
     val out = new PrintWriter(new BufferedWriter(new RemoteWriter(channel, false), 1024))
-    val err = new PrintWriter(new BufferedWriter(new RemoteWriter(channel, false), 1024))
+    val err = new PrintWriter(new BufferedWriter(new RemoteWriter(channel, true), 1024))
     // TODO: Handle stdin
-    val io = new IO(null, out, err)
+    val in = new BufferedReader(new InputStreamReader(System.in))
+    val io = new IO(in, out, err)
     
     env.spacy match {
       case r: Request => 
@@ -69,6 +74,7 @@ object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope
     }
     
     io.close
+    channel.eos()
   }
   
   def invoke(args: Array[String], io: IO) {

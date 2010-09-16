@@ -50,6 +50,15 @@ object RemoteProtocol extends SpacyProtocol {
     def writes(out: sbinary.Output, o: Output) = write(out, o.str)
   }
   
+  implicit object ErrorFormat extends SpacyFormat[Error] {
+    def reads(in : Input, o: ObjID) = new Error(
+        read[String](in)) {
+        override val objID = o
+      }   
+    def writes(out: sbinary.Output, o: Error) = write(out, o.str)
+  }
+  
   Space.FormatRegistry.register(classOf[Request].asInstanceOf[Class[Any]], RequestFormat.asInstanceOf[SpacyFormat[Spacy]])
   Space.FormatRegistry.register(classOf[Output].asInstanceOf[Class[Any]], OutputFormat.asInstanceOf[SpacyFormat[Spacy]])
+  Space.FormatRegistry.register(classOf[Error].asInstanceOf[Class[Any]], ErrorFormat.asInstanceOf[SpacyFormat[Spacy]])
 }

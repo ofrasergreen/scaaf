@@ -14,12 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.cli
+package scaaf
+package cli
+
+import scala.collection.mutable.ListBuffer
 
 /**
  * @author ofrasergreen
  *
  */
 case class Group(name: String, description: String) extends Entry {
-  val entries = scala.collection.mutable.ListBuffer[Entry]()
+  val entries = ListBuffer[Entry]()
 }

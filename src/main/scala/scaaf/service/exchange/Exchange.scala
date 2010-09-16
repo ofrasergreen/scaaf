@@ -14,23 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf.service.exchange
+package scaaf
+package service.exchange
 
 import scaaf.logging.Logging
 
-import scaaf.remote.Frame
-import scaaf.remote.Message
-import scaaf.exchange.ReplyingSubscriber
-import scaaf.exchange.Subscribable
-import scaaf.space.Spacy
-import scaaf.isc.exchange.Envelope
-import scaaf.exchange.Replyable
+import remote.Frame
+import remote.Message
+
+import exchange.ReplyingSubscriber
+import exchange.Subscribable
+import exchange.Replyable
+
+import space.Spacy
+import isc.exchange.Envelope
+import service.Service
 
 /**
  * @author ofrasergreen
  *
  */
-object Exchange extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscriber[Spacy]] with ReplyingSubscriber[Envelope] with Logging {
+object Exchange extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscriber[Spacy]] with ReplyingSubscriber[Envelope] with Service with Logging {
   def deliver(env: Envelope, channel: scaaf.exchange.Replyable[Envelope]) { 
     Log.debug("Dispatching service to " + env.destination)
     val subscriber = subscribers(env.destination.toInt)

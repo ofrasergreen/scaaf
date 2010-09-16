@@ -28,15 +28,15 @@ import java.io.PrintWriter
  */
 class Help extends CLIService {
   def help(cats: Seq[String]): CLIView = {
-    val groups = new TableOutput($RootGroup().entries.map(e => MapOutput(
+    val groups = TableView($RootGroup().entries.map(e => ListMap(
       "category" -> e.name,
       "description" -> e.description
-    )).toList)
+    )))
     
     new CLIView() {
       def render(io: IO) = {
-        io.out.println("usage: " + Configuration.name + " <command> [subcommand] [options] [args]")
-        io.out.println("Type '" + Configuration.name + " help <command>' for help on a specific command.")
+        io.out.println("usage: " + Configuration.name + " <command> [subcommands...] [options] [args]")
+        io.out.println("Type '" + Configuration.name + " <command> help' for help on a specific command.")
         io.out.println()
         io.out.println("Available commands:")
         groups.format.drop(1).foreach(c => io.out.println("   " + c ))

@@ -46,6 +46,7 @@ import JavaIO._
  */
 class PosixSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with InitSpec {
   override def beforeEach = reset
+  System.setProperty("org.newsclub.net.unix.library.path", scaaf.Configuration.libDir)
 
   "The IPC POSIX controller" should {
     val f = new File("test" + File.separator + "ipc.sock")
@@ -54,7 +55,7 @@ class PosixSpec extends WordSpec with MustMatchers with BeforeAndAfterEach with 
       assert(f.exists === true)
     }
     
-    "let clients connect to the socket" in {
+    "let clients connect to the socket" in {      
       val sock = AFUNIXSocket.newInstance();
       sock.connect(new AFUNIXSocketAddress(f));
       sock.close

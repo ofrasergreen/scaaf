@@ -16,21 +16,23 @@
  */
 package scaaf.cli
 
-import scaaf.space._
-import scala.collection.mutable.ListBuffer
-import java.io.PrintWriter
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * @author ofrasergreen
  *
  */
-class CSVTableOutput(rows: List[MapOutput]) extends CLIView {
+trait ListView extends CLIView {
+  this: Seq[Any] =>
+  
   def render(io: IO) {
-    if (!rows.isEmpty) {
-      // Print the header
-      val first = rows.head
-      io.out.println(first.keys.mkString(","))
-      rows.foreach(y => io.out.println(y.values.mkString(",")))
+    if (!this.isEmpty) {
+      this.foreach(y => io.out.println(y.toString))
     }
   }
+}
+
+object ListView {
+  def apply(xs: Seq[Any]) = empty ++= xs
+  def empty = new ArrayBuffer[Any] with ListView
 }

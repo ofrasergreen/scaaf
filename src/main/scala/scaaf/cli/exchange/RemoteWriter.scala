@@ -26,10 +26,12 @@ import scaaf.isc.exchange.Envelope
  */
 class RemoteWriter(channel: Replyable[Envelope], error: Boolean) extends java.io.Writer {
   override def close {
-    channel.eos
+    // Do nothing
   }
   
-  override def flush {}
+  override def flush {
+    // Do nothing
+  }
   
   override def write(cbuf: Array[Char], off: Int, len: Int) {
     val str = new String(cbuf, off, len)

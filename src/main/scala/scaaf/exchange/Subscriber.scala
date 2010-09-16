@@ -19,7 +19,7 @@ package scaaf.exchange
 
 import scaaf.service.Service
 
-trait Subscriber[M, C] extends Service {
+trait Subscriber[M, C] {
   //def deliver(channel: Channel): PartialFunction[T, Unit]
   def deliver(msg: M, channel: C)
 }

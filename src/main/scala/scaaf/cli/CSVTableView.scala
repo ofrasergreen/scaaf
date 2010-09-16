@@ -14,37 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package scaaf
-package cli
+package scaaf.cli
 
-import scaaf.service.Service
-
+import scaaf.space._
 import java.io.PrintWriter
+import scala.collection.mutable.ArrayBuffer
 
 /**
- * A registry mapping CLI commands or groups to their implementation
- * 
  * @author ofrasergreen
+ *
  */
-class RootGroup extends Group("", "") {
-  entries += scaaf.kernel.$NodeCLIGroup()
-  entries += $HelpGroup()
+trait CSVTableView extends CLIView {
+  this: Seq[Map[String, Any]] =>
   
-//  deliver += ({
-//    case "node" :: args => kernel.$NodeCLIGroup()(args)
-//    case "help" :: args => $HelpGroup()(args)
-//  })
-  
-  def deliver(args: Seq[String], io: IO) {
-    val tail = args.tail
-    args.head match {
-      case "node" => kernel.$NodeCLIGroup().deliver(tail, io)
-      case "help" => $HelpGroup().deliver(tail, io)
+  def render(io: IO) {
+    if (!this.isEmpty) {
+      // Print the header
+      val first = this.head
+      io.out.println(first.keys.mkString(","))
+      this.foreach(y => io.out.println(y.values.mkString(",")))
     }
   }
 }
 
-object $RootGroup {
-  var o = new RootGroup
-  def apply() = o
+object CSVTableView {
+  def apply(xs: Seq[Map[String, Any]]) = empty ++= xs
+  def empty = new ArrayBuffer[Map[String, Any]] with CSVTableView
 }

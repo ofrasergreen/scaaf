@@ -38,7 +38,6 @@ object Exchange extends scaaf.exchange.Exchange with Subscribable[ReplyingSubscr
         
         // TODO: Look up the exchange ClsID from the Exchange ID, then find 
         // it in the extension point register
-        println(subscribers)
         val exchange = subscribers(m.address.addID.cls)
         val chan = new Channel(channel)
         exchange.deliver(Envelope(m.address.addID.data, m.payload), chan)

@@ -38,6 +38,7 @@ trait Spacy {
   def valid = true
 }
 
+// TODO: This shouldn't be a case class. Create a companion object for convenient construction
 case class Ref[T <: Spacy](obj: T) {
   private var pobj = obj
   private var pObjID:ObjID = null
@@ -56,6 +57,13 @@ case class Ref[T <: Spacy](obj: T) {
     if (pObjID == null) pObjID = pobj.objID 
     pObjID
   }
+  
+  override def hashCode(): Int = objID.hashCode
+  override def equals(that: Any): Boolean = that match {
+    case other: Ref[T] => (objID == other.objID)
+    case _ => false
+  }
+  override def toString(): String = "Ref(%s)".format(objID.toString)
 }
 
 case class Write[T <: Spacy](obj: T)

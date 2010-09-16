@@ -23,6 +23,7 @@ import exchange.Exchange
 import scaaf.remote.IPCClient
 import exchange.Request
 import exchange.Output
+import exchange.Error
 import scaaf.remote.Message
 import scaaf.remote.Reply
 import scaaf.remote.End
@@ -55,11 +56,11 @@ object Invoker {
       var done = false
       do {
         ipcClient.receive match {
-          case r: Reply => {
-            r.payload match {
+          case Reply(payload) =>
+            payload match {
               case Output(s) => print(s)
+              case Error(s) => System.err.print(s)
             }
-          }
           case e: End => done = true
         }
       } while (!done) 
