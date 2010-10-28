@@ -32,7 +32,6 @@ trait Application extends Logging {
     Log.initialize
     
     // Bootstrap
-    Log.debug("Bootstrapping...")
     scaaf.kernel.Bootstrap
     
     // Invoke
