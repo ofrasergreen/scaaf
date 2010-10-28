@@ -1,7 +1,7 @@
 import sbt._
 import de.element34.sbteclipsify._
 
-class ScaliProject(info: ProjectInfo) extends DefaultProject(info) with Eclipsify {
+class ScaliProject(info: ProjectInfo) extends DefaultProject(info) with Eclipsify with IdeaProject {
   val rabbitmq = "com.rabbitmq" % "amqp-client" % "1.7.2"
   val slf4j = "org.slf4j" % "slf4j-log4j12" % "1.6.0"
   val sbinary = "org.scala-tools.sbinary" % "sbinary_2.8.0" % "0.3.1-SNAPSHOT"
