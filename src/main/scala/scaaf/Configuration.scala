@@ -22,7 +22,7 @@ package scaaf
  */
 object Configuration {
   var name: String = "UNDEFINED"
-  var varDir: String = "var"
-  var libDir: String = "lib"
+  var varDir: String = Option(System.getProperty("scaaf.var")).getOrElse("var")
+  var libDir: String = Option(System.getProperty("scaaf.lib")).getOrElse("lib")
   var logLevel: Int = 5
 }
