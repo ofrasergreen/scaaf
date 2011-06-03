@@ -75,7 +75,7 @@ object Invoker {
         Exchange.invoke(args, io)
       } catch {
         case e: Throwable =>
-          System.err.println(e.getMessage)
+          io.err.println(e.getMessage)
           if (scaaf.Configuration.logLevel > 3) e.printStackTrace()
           exitCode = 1
       }

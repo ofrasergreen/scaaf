@@ -57,7 +57,7 @@ trait TableView extends CLIView {
       var row = ""
       var i = 0
       y.foreach(col => {
-        row += col.toString + " " * (lengths(i) - col.toString.length + 1)
+        row += col.toString + " " * (lengths(i) - col.toString.length + 2)
         i += 1
       })
       output += row

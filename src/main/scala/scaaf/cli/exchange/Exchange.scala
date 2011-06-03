@@ -68,7 +68,10 @@ object Exchange extends scaaf.exchange.Exchange with ReplyingSubscriber[Envelope
         try {
           invoke(r.args, io)
         } catch {
-          case e: Exception => io.err.println(e.getMessage)
+          case e: CLIException => io.err.println(e.getMessage)
+          case e: Exception =>
+            io.err.println(e.getMessage)
+            Log.error("Error processing CLI", e)
         }
       case _ => Log.error("Received unwanted message of type " + env.spacy.getClass)
     }
