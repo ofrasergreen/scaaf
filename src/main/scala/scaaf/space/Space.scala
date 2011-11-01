@@ -67,6 +67,7 @@ case class Ref[T <: Spacy](obj: T) {
 }
 
 case class Write[T <: Spacy](obj: T)
+case class Delete[T <: Spacy](obj: T)
 case object Stats
 case object Reboot
 case object Done
@@ -81,6 +82,12 @@ object Space extends Actor with Logging {
   
   def act = loop {
     react {
+      case Delete(obj) =>
+        // Store it to disk
+        if (!memOnly) removeFromDisk(obj)
+        
+        removeFromCache(obj)
+        reply(Done)
       case Write(obj) =>
         // Store it to disk
         if (!memOnly) writeToDisk(obj)
@@ -108,6 +115,11 @@ object Space extends Actor with Logging {
     cache(obj.objID) = obj
     stats = stats copy (objectCount = stats.objectCount + 1)
   }
+  
+  private def removeFromCache(obj: Spacy) = {
+    cache.remove(obj.objID)
+    stats = stats copy (objectCount = stats.objectCount - 1)
+  }
  
   def serialize(obj: Spacy, os: Output) {
     val cls: Class[_] = if (obj.getClass.getName.contains("$anon$")) obj.getClass.getSuperclass else obj.getClass
@@ -118,9 +130,11 @@ object Space extends Actor with Logging {
     format.writes(os, obj)
   }
   
-  private def writeToDisk(obj: Spacy): Unit = {
-    //Log.debug("Writing " + obj.guid)
-    // TODO - Find a cleaner way to do this
+  private def removeFromDisk(obj: Spacy): Unit = {
+      objFile(obj).delete()
+  }
+  
+  private def objFile(obj: Spacy): File = {
     val cls = if (obj.getClass.getName.contains("$anon$")) obj.getClass.getSuperclass else obj.getClass
     val className = cls.getCanonicalName
     
@@ -128,7 +142,11 @@ object Space extends Actor with Logging {
     val dirName = spaceDir + File.separator + className.replaceAll("\\.", File.separator)
     new File(dirName).mkdirs
     
-    val file = new File(dirName + File.separator + obj.objID.toString)
+    new File(dirName + File.separator + obj.objID.toString)
+  }
+  
+  private def writeToDisk(obj: Spacy): Unit = {
+    val file = objFile(obj)
     
     // Write it
     val out = new BufferedOutputStream(new FileOutputStream(file))
@@ -202,6 +220,10 @@ object Space extends Actor with Logging {
     } else {
       throw ValidationException("Validation failed when storing " + obj.getClass + " " + obj.objID)
     }
+  }
+  
+  def delete(obj: Spacy) {
+    this !? Delete(obj)
   }
   
   object FormatRegistry extends Logging {
