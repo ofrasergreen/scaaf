@@ -200,7 +200,7 @@ object GUID extends Actor {
   }
   
   private def setClass(cls: Class[_], bytes: Array[Byte]) = {
-    val hc = cls.getCanonicalName.hashCode
+    val hc = cls.getName.hashCode
     bytes(0) = ((hc >>> 24) & 0xff).toByte
     bytes(1) = ((hc >>> 16) & 0xff).toByte
     bytes(2) = ((hc >>> 8) & 0xff).toByte
